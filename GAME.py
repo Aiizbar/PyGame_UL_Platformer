@@ -6,15 +6,15 @@ import pygame
 pygame.init()
 level = [
        "--------------------------------",
-       "-            -      -          -",
-       "-            -      -          -",
-       "-            -      -          -",
-       "-            -      -          -",
-       "-            -      -          -",
-       "-            -      -          -",
-       "-            -      -          -",
        "-                              -",
        "-                              -",
+       "-                              -",
+       "-                              -",
+       "-                              -",
+       "-                              -",
+       "-      -----                   -",
+       "-                              -",
+       "-              -----           -",
        "----                           -",
        "-                              -",
        "-       ---        -----       -",
@@ -37,8 +37,8 @@ class Game:
         self.speed = 5
         self.key_invent = False
         self.image_hero_list = [
-            pygame.image.load('anonimus1.png'),
-            pygame.image.load('anonimus2.png')]
+            pygame.image.load('../IMAGE_GAME/IMAGE_HERO_D/anonimus1.png'),
+            pygame.image.load('../IMAGE_GAME/IMAGE_HERO_D/anonimus2.png')]
         self.image_hero_list[0] = pygame.transform.scale(self.image_hero_list[0], (40, 50))
         self.image_hero_list[1] = pygame.transform.scale(self.image_hero_list[1], (40, 50))
 
@@ -50,6 +50,8 @@ class Game:
         self.yvel = 0  # скорость вертикального перемещения
         self.onGround = False  # определяющая на земле мы или нет
         self.gravity(True)
+        self.jump_time = 0
+        self.stop_jump = True
 
     def move(self, keys):
         if keys[pygame.K_ESCAPE]:
@@ -58,7 +60,7 @@ class Game:
             self.onGround = False
         if keys[pygame.K_SPACE]:
             if self.onGround:
-                self.jump()
+                self.stop_jump = False
         if keys[pygame.K_d]:
             self.x_hero += self.speed
         elif keys[pygame.K_a]:
@@ -116,9 +118,13 @@ class Game:
             self.onGround = True
             self.yvel = 1
 
-    def jump(self):
-        for i in range(10):
+    def jump(self, stop):
+        if stop == True and self.stop_jump == False:
             self.y_hero -= 10
+            self.jump_time += 1
+            if self.jump_time == 15:
+                self.jump_time = 0
+                self.stop_jump = True
 
 
 
@@ -127,9 +133,9 @@ class Game:
 t = 0
 size = (800, 500)
 screen = pygame.display.set_mode(size)
-bg = pygame.image.load('MAP1.png')
-key = pygame.image.load('KEY.png')
-passage = pygame.image.load('EXIT.png')
+bg = pygame.image.load('../IMAGE_GAME/IMAGE_MAP/MAP1.png')
+key = pygame.image.load('../IMAGE_GAME/IMAGE_MAP/KEY.png')
+passage = pygame.image.load('../IMAGE_GAME/IMAGE_MAP/EXIT.png')
 a = Game(size, screen)
 clock = pygame.time.Clock()
 run = 1
@@ -171,6 +177,7 @@ while run:
         a.move(keys)
     # здесь передаем значение методу гравити(просто что бы работало)
     a.gravity(True)
+    a.jump(True)
     screen.blit(a.image_hero, (a.x_hero, a.y_hero))
     entities.draw(screen)
     a.update(entities)
