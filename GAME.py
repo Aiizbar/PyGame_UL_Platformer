@@ -37,8 +37,8 @@ class Game:
         self.speed = 5
         self.key_invent = False
         self.image_hero_list = [
-            pygame.image.load('../IMAGE_GAME/IMAGE_HERO_D/anonimus1.png'),
-            pygame.image.load('../IMAGE_GAME/IMAGE_HERO_D/anonimus2.png')]
+            pygame.image.load('anonimus1.png'),
+            pygame.image.load('anonimus2.png')]
         self.image_hero_list[0] = pygame.transform.scale(self.image_hero_list[0], (40, 50))
         self.image_hero_list[1] = pygame.transform.scale(self.image_hero_list[1], (40, 50))
 
@@ -127,9 +127,9 @@ class Game:
 t = 0
 size = (800, 500)
 screen = pygame.display.set_mode(size)
-bg = pygame.image.load('../IMAGE_GAME/IMAGE_MAP/MAP1.png')
-key = pygame.image.load('../IMAGE_GAME/IMAGE_MAP/KEY.png')
-passage = pygame.image.load('../IMAGE_GAME/IMAGE_MAP/EXIT.png')
+bg = pygame.image.load('MAP1.png')
+key = pygame.image.load('KEY.png')
+passage = pygame.image.load('EXIT.png')
 a = Game(size, screen)
 clock = pygame.time.Clock()
 run = 1
