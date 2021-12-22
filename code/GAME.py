@@ -1,6 +1,7 @@
 import sys
 
 from block import Platform
+from Enemu import Enemy
 import pygame
 pygame.init()
 level = [
@@ -8,19 +9,19 @@ level = [
        "-                              -",
        "-                              -",
        "-                              -",
-       "-                              -",
+       "-                  E           -",
        "-                              -",
        "-                              -",
        "-      -----                   -",
        "-                              -",
        "-              -----           -",
        "----                           -",
-       "-                              -",
+       "-                         E    -",
        "-       ---        -----       -",
        "-                              -",
        "-                              -",
        "-               -----          -",
-       "-                              -",
+       "-           E                  -",
        "-                              -",
        "-                              -",
        "--------------------------------"]
@@ -141,21 +142,22 @@ run = 1
 PLATFORM_WIDTH = 25
 PLATFORM_HEIGHT = 25
 PLATFORM_COLOR = "#FF6262"
-entities = pygame.sprite.Group() # Все объекты
+entities = pygame.sprite.Group() # Все объекты-платформы
 # platforms = []
+adversary = pygame.sprite.Group() # Все спрайты-противники
 x = y = 0
 for row in level:  # вся строка
     for col in row:  # каждый символ
-        if col == "-":
-            # pr = pygame.Surface((PLATFORM_WIDTH, PLATFORM_HEIGHT))
+        if col == "-": # если платформа
             pf = Platform(x, y)
-            # platforms.append(pf)
             entities.add(pf)
-            # pr.fill(pygame.Color(PLATFORM_COLOR))
-            # screen.blit(pr, (x, y))
-        x += PLATFORM_WIDTH  #
+        elif col == "E":
+            opponent = Enemy(x, y)
+            adversary.add(opponent)
+        x += PLATFORM_WIDTH
     y += PLATFORM_HEIGHT
     x = 0
+
 while run:
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
@@ -177,9 +179,13 @@ while run:
     # здесь передаем значение методу гравити и джамп для постоянной проверки на каждой итерации
     a.gravity(True)
     a.jump(True)
+    # вывод на экран героя
     screen.blit(a.image_hero, (a.x_hero, a.y_hero))
+    # обновление платформ и их вывод
     entities.draw(screen)
     a.update(entities)
+    # обновление врагов и их вывод
+    adversary.draw(screen)
     clock.tick(60)
     pygame.display.set_caption(f"{clock.get_fps()}")
     pygame.display.update()
