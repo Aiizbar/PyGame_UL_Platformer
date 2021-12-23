@@ -18,7 +18,7 @@ class Enemy(pg.sprite.Sprite):
         # создание спрайтов для отображения
         self.rect = pg.Rect(self.x_enemy, self.y_enemy, ENEMY_WIDTH, ENEMY_HEIGHT)
         self.image = pg.Surface((ENEMY_WIDTH, ENEMY_HEIGHT))
-        self.image = pg.image.load("../IMAGE_GAME/IMAGE_HERO_D/mushrum.png")
+        self.image = pg.image.load("../IMAGE_GAME/IMAGE_HERO_D/anonimus1.png")
         self.image = pg.transform.scale(self.image, (40, 50))
         self.image = self.image.convert_alpha()
         # print(self.image, self.rect, "init")
