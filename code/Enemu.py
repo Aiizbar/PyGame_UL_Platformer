@@ -11,23 +11,34 @@ ENEMY_HEIGHT = 50
 class Enemy(pg.sprite.Sprite):
     def __init__(self, x, y):
         pg.sprite.Sprite.__init__(self)
-        self.x = x
-        self.y = y
+        # переменные для предвижения
+        self.x_enemy = x
+        self.y_enemy = y
+        self.speed_enemy = 3
+        # создание спрайтов для отображения
+        self.rect = pg.Rect(self.x_enemy, self.y_enemy, ENEMY_WIDTH, ENEMY_HEIGHT)
         self.image = pg.Surface((ENEMY_WIDTH, ENEMY_HEIGHT))
         self.image = pg.image.load("../IMAGE_GAME/IMAGE_HERO_D/mushrum.png")
         self.image = pg.transform.scale(self.image, (40, 50))
-        # self.image = self.image.convert_alpha()
-        self.rect = pg.Rect(x, y, ENEMY_WIDTH, ENEMY_HEIGHT)
-        size = (800, 500)
-        self.screen = pg.display.set_mode(size)
+        self.image = self.image.convert_alpha()
+        # print(self.image, self.rect, "init")
 
-    # def spavn(self, x, y):
-    #     self.image = pg.Surface((ENEMY_WIDTH, ENEMY_HEIGHT))
-    #     self.image = pg.image.load("../IMAGE_GAME/IMAGE_HERO_D/mushrum.jpg")
-    #     self.rect = pg.Rect(x, y, ENEMY_WIDTH, ENEMY_HEIGHT)
+    def spavn(self, x, y):
+        pass
+        # переменные для предвижения
+        # self.x_enemy = x
+        # self.y_enemy = y
+        # self.speed_enemy = 3
+        # # создание спрайтов для отображения
+        # self.rect = pg.Rect(self.x_enemy, self.y_enemy, ENEMY_WIDTH, ENEMY_HEIGHT)
+        # self.image = pg.Surface((ENEMY_WIDTH, ENEMY_HEIGHT))
+        # self.image = pg.image.load("../IMAGE_GAME/IMAGE_HERO_D/mushrum.png")
+        # self.image = pg.transform.scale(self.image, (40, 50))
+        # self.image = self.image.convert_alpha()
+        # print(self.image, self.rect, "init")
 
     def movi_enemy(self):
-        pass
+        self.x_enemy += self.speed_enemy
 
     def visor(self):
         pass
@@ -35,5 +46,3 @@ class Enemy(pg.sprite.Sprite):
     def attack(self):
         pass
 
-    def render(self):
-        self.screen.blit(self.image, (self.x, self.y))

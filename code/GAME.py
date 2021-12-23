@@ -146,6 +146,9 @@ entities = pygame.sprite.Group() # Все объекты-платформы
 # platforms = []
 adversary = pygame.sprite.Group() # Все спрайты-противники
 x = y = 0
+x_enemy = []
+y_enemy = []
+# enem = Enemy()
 for row in level:  # вся строка
     for col in row:  # каждый символ
         if col == "-": # если платформа
@@ -153,6 +156,9 @@ for row in level:  # вся строка
             entities.add(pf)
         elif col == "E":
             opponent = Enemy(x, y)
+            print(opponent)
+            x_enemy.append(x)
+            y_enemy.append(y)
             adversary.add(opponent)
         x += PLATFORM_WIDTH
     y += PLATFORM_HEIGHT
@@ -186,6 +192,7 @@ while run:
     a.update(entities)
     # обновление врагов и их вывод
     adversary.draw(screen)
+    # действия врага
     clock.tick(60)
     pygame.display.set_caption(f"{clock.get_fps()}")
     pygame.display.update()
