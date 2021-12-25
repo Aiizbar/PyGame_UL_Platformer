@@ -14,5 +14,6 @@ class Platform(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self)
         self.image = pg.Surface((PLATFORM_WIDTH, PLATFORM_HEIGHT))
         self.image = pg.image.load("../IMAGE_GAME/IMAGE_MAP/TREE.png")
+        self.image = self.image
         # self.image.fill(pg.Color(PLATFORM_COLOR))
         self.rect = pg.Rect(x, y, PLATFORM_WIDTH, PLATFORM_HEIGHT)

@@ -1,7 +1,7 @@
 import sys
 
 from block import Platform
-from Enemu import Enemy
+import pygame as pg
 import pygame
 pygame.init()
 level = [
@@ -16,7 +16,7 @@ level = [
        "-                              -",
        "-              -----           -",
        "----                           -",
-       "-                         E    -",
+       "-                              -",
        "-       ---        -----       -",
        "-                              -",
        "-                              -",
@@ -144,25 +144,80 @@ PLATFORM_HEIGHT = 25
 PLATFORM_COLOR = "#FF6262"
 entities = pygame.sprite.Group() # Все объекты-платформы
 # platforms = []
-adversary = pygame.sprite.Group() # Все спрайты-противники
 x = y = 0
 x_enemy = []
 y_enemy = []
-enem = Enemy()
+
 for row in level:  # вся строка
     for col in row:  # каждый символ
         if col == "-": # если платформа
-            pf = enem.spavn(x, y)
+            pf = Platform(x, y)
             entities.add(pf)
         elif col == "E":
-            opponent = Enemy(x, y)
-            print(opponent)
+            # opponent = Enemy(x, y)
             x_enemy.append(x)
             y_enemy.append(y)
-            adversary.add(opponent)
+            # adversary.add(opponent)
         x += PLATFORM_WIDTH
     y += PLATFORM_HEIGHT
     x = 0
+
+
+
+
+
+ENEMY_WIDTH = 40
+ENEMY_HEIGHT = 50
+
+
+
+class Enemy(pg.sprite.Sprite):
+    def __init__(self, x, y):
+        pg.sprite.Sprite.__init__(self)
+        # переменные для предвижения
+        self.x_e = x
+        self.y_e = y
+        self.speed_enemy = 3
+        # создание спрайтов для отображения
+        # self.rect = pg.Rect(self.x_e, self.y_e, ENEMY_WIDTH, ENEMY_HEIGHT)
+        # self.image = pg.Surface((ENEMY_WIDTH, ENEMY_HEIGHT))
+        self.image_e = pg.image.load("../IMAGE_GAME/IMAGE_HERO_D/anonimus1.png")
+        self.image_e = pg.transform.scale(self.image_e, (40, 50))
+        self.yvel = 5
+
+    # def movi_enemy(self):
+    #     # self.x_e += self.speed_enemy
+    #     x_enemy[self.typ] += self.speed_enemy
+
+    def visor(self):
+        pass
+
+    def attack(self):
+        pass
+
+    def walls(self, e):
+        self.rect = pygame.Rect(x_enemy[self.typ], y_enemy[self.typ], 40, 50)
+        if not pygame.sprite.spritecollideany(self, e):
+            # если нет столкновения с платформой - падаем вниз
+            self.onGround = False
+        else:
+            # если есть пересечени с платформой остонавливаем падение
+            self.onGround = True
+
+    def gravity(self):
+        if self.onGround == False:
+            y_enemy[self.typ] += self.yvel
+
+    def update(self, i, wall):
+        self.typ = i
+        self.walls(wall)
+        self.gravity()
+        # self.movi_enemy()
+
+
+for i in range(len(x_enemy)):
+    opponent = Enemy(x_enemy[i], y_enemy[i])
+
 
 while run:
     for event in pygame.event.get():
@@ -191,8 +246,10 @@ while run:
     entities.draw(screen)
     a.update(entities)
     # обновление врагов и их вывод
-    adversary.draw(screen)
-    # действия врага
+    for i in range(len(x_enemy)):
+        ene = Enemy(x_enemy[x], y_enemy[i])
+        ene.update(i, entities)
+        screen.blit(ene.image_e, (ene.x_e, ene.y_e))
     clock.tick(60)
     pygame.display.set_caption(f"{clock.get_fps()}")
     pygame.display.update()
