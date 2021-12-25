@@ -148,11 +148,11 @@ adversary = pygame.sprite.Group() # Все спрайты-противники
 x = y = 0
 x_enemy = []
 y_enemy = []
-# enem = Enemy()
+enem = Enemy()
 for row in level:  # вся строка
     for col in row:  # каждый символ
         if col == "-": # если платформа
-            pf = Platform(x, y)
+            pf = enem.spavn(x, y)
             entities.add(pf)
         elif col == "E":
             opponent = Enemy(x, y)
