@@ -34,7 +34,8 @@ class Game:
         self.screen = screen
         self.x_hero = self.wall_x = 40
         self.y_hero = self.wall_y = 40
-        self.speed = 5
+        self.speed_left = 5
+        self.speed_right = 5
         self.key_invent = False
         self.image_hero_list = [
             pygame.image.load('../IMAGE_GAME/IMAGE_HERO_D/anonimus1.png'),
@@ -52,19 +53,22 @@ class Game:
         self.gravity(True)
         self.jump_time = 0
         self.stop_jump = True
+        self.right = False
+        self.left = False
+        self.Hitpoints = 40
 
     def move(self, keys):
         if keys[pygame.K_ESCAPE]:
             sys.exit()
-        if keys[pygame.K_s]:
-            self.onGround = False
         if keys[pygame.K_SPACE]:
             if self.onGround:
                 self.stop_jump = False
         if keys[pygame.K_d]:
-            self.x_hero += self.speed
+            self.x_hero += self.speed_left
+            self.left = True
         elif keys[pygame.K_a]:
-            self.x_hero -= self.speed
+            self.x_hero -= self.speed_right
+            self.right = False
 
     def render(self):
         if self.count >= 8:
@@ -117,6 +121,12 @@ class Game:
             # если есть пересечени с платформой остонавливаем падение
             self.onGround = True
             self.yvel = 1
+        # if self.right == True:
+        #     self.speed_right = 0
+        #     self.speed_left = 5
+        # if self.left == True:
+        #     self.speed_left = 0
+        #     self.speed_right = 5
 
     def jump(self, stop):
         if stop == True and self.stop_jump == False:
@@ -184,6 +194,7 @@ class Enemy(pg.sprite.Sprite):
         self.image_e = pg.image.load("../IMAGE_GAME/IMAGE_HERO_D/anonimus1.png")
         self.image_e = pg.transform.scale(self.image_e, (40, 50))
         self.yvel = 5
+        self.vidder = False # видел ни враг игрока
 
     # def movi_enemy(self):
     #     # self.x_e += self.speed_enemy
@@ -192,8 +203,19 @@ class Enemy(pg.sprite.Sprite):
     def visor(self):
         pass
 
-    def attack(self):
-        pass
+    def attack(self, visa):
+        if visa == "Right":
+            rect_attack = pygame.Rect(x_enemy[self.typ] + 30, y_enemy[self.typ], 30, 30)
+            rect_Player = pygame.Rect(a.x_hero, a.y_hero, 40, 50)
+            col = pygame.sprite.collide_rect(rect_attack, rect_Player)
+            if col == True:
+                a.Hitpoints -= 10
+        elif visa == "Left":
+            rect_attack = pygame.Rect(x_enemy[self.typ] - 60, y_enemy[self.typ], 30, 30)
+            rect_Player = pygame.Rect(a.x_hero, a.y_hero, 40, 50)
+            col = pygame.sprite.collide_rect(rect_attack, rect_Player)
+            if col == True:
+                a.Hitpoints -= 10
 
     def walls(self, e):
         self.rect = pygame.Rect(x_enemy[self.typ], y_enemy[self.typ], 40, 50)
@@ -212,6 +234,9 @@ class Enemy(pg.sprite.Sprite):
         self.typ = i
         self.walls(wall)
         self.gravity()
+        self.visor()
+        if abs(a.x_hero - x_enemy[self.typ]) <= 30 and (a.y_hero - y_enemy[self.typ]) <= 30 and self.vidder == True:
+            self.attack(self.direction) # говорим в какую сторону атаковать
         # self.movi_enemy()
 
 
@@ -251,5 +276,5 @@ while run:
         ene.update(i, entities)
         screen.blit(ene.image_e, (ene.x_e, ene.y_e))
     clock.tick(60)
-    pygame.display.set_caption(f"{clock.get_fps()}")
+    pygame.display.set_caption(f"{clock.get_fps(), a.Hitpoints}")
     pygame.display.update()
