@@ -7,26 +7,30 @@ pygame.init()
 
 
 level = [
-       "--------------------------------",
-       "-                              -",
-       "-                              -",
-       "-                              -",
-       "-                              -",
-       "-                              -",
-       "-                              -",
-       "-      -----     E             -",
-       "-                              -",
-       "-              -----           -",
-       "----                           -",
-       "-                              -",
-       "-       ---        -----       -",
-       "-               E              -",
-       "-                              -",
-       "-               -----          -",
-       "-                              -",
-       "-                              -",
-       "-                              -",
-       "--------------------------------"]
+       "----------------------------------",
+       "-                                -",
+       "-                       --       -",
+       "-                                -",
+       "-            --                  -",
+       "-                                -",
+       "--                               -",
+       "-                                -",
+       "-                   ----     --- -",
+       "-                                -",
+       "--                               -",
+       "-                                -",
+       "-                            --- -",
+       "-                    E           -",
+       "-                                -",
+       "-      ---                       -",
+       "-                                -",
+       "-   -------         ----         -",
+       "-                                -",
+       "-                         -      -",
+       "-                            --  -",
+       "-                                -",
+       "-                                -",
+       "----------------------------------"]
 
 
 
@@ -147,7 +151,9 @@ class Game:
 # pygame.mixer.music.load('../SOUNDS/sound_bg1.ogg')
 # pygame.mixer.music.play()
 t = 0
-size = (800, 500)
+wight = 800
+height = 500
+size = (wight, height)
 screen = pygame.display.set_mode(size)
 bg = pygame.image.load('../IMAGE_GAME/IMAGE_MAP/MAP1.png')
 key = pygame.image.load('../IMAGE_GAME/IMAGE_MAP/KEY.png')
@@ -297,6 +303,34 @@ for i in range(len(x_enemy)):
     opponent = Enemy(x_enemy[i], y_enemy[i])
 
 
+class Camera:
+    # зададим начальный сдвиг камеры
+    def __init__(self):
+        self.dx = 0
+        self.dy = 0
+
+    # сдвинуть объект obj на смещение камеры
+    def apply(self, obj):
+        obj.rect.x += self.dx
+        obj.rect.y += self.dy
+
+    # позиционировать камеру на объекте target
+    def update(self, target):
+        self.dx = -(target.rect.x + target.rect.w // 2 - wight // 2)
+        self.dy = -(target.rect.y + target.rect.h // 2 - height // 2)
+
+
+
+class Player(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__()
+        self.image = a.image_hero
+        self.rect = self.image.get_rect().move(
+            50 * pos_x + 15, 40 * pos_y + 5)
+
+
+camera = Camera()
+
 while run:
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
@@ -321,11 +355,15 @@ while run:
     # вывод на экран героя
     screen.blit(a.image_hero, (a.x_hero, a.y_hero))
     # обновление платформ и их вывод
-    entities.draw(screen)
+    player = Player(a.x_hero, a.y_hero)
+    camera.update(player)  # центризируем камеру относительно персонажа
+    for e in entities:
+        camera.apply(e)
+    # entities.draw(screen)
     a.update(entities)
     # обновление врагов и их вывод
     for i in range(len(x_enemy)):
-        ene = Enemy(x_enemy[i], y_enemy[i])
+        ene = Enemy(x_enemy[x], y_enemy[i])
         ene.update(i, entities)
         screen.blit(ene.image_e, (ene.x_e, ene.y_e))
     clock.tick(60)
