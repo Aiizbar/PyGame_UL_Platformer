@@ -2,6 +2,7 @@ import sys
 from block import Platform
 import pygame as pg
 import pygame
+import copy
 pygame.init()
 
 
@@ -131,12 +132,6 @@ class Game:
             # если есть пересечени с платформой остонавливаем падение
             self.onGround = True
             self.yvel = 1
-        # if self.right == True:
-        #     self.speed_right = 0
-        #     self.speed_left = 5
-        # if self.left == True:
-        #     self.speed_left = 0
-        #     self.speed_right = 5
 
     def jump(self, stop):
         if stop == True and self.stop_jump == False:
@@ -145,6 +140,11 @@ class Game:
             if self.jump_time == 15:
                 self.jump_time = 0
                 self.stop_jump = True
+
+    def copy(self):
+        self.xx_hero = copy.copy(self.x_hero)
+        self.yy_hero = copy.copy(self.y_hero)
+
 
 
 
@@ -155,7 +155,7 @@ wight = 800
 height = 500
 size = (wight, height)
 screen = pygame.display.set_mode(size)
-bg = pygame.image.load('../IMAGE_GAME/IMAGE_MAP/MAP1.png')
+bg = pygame.image.load('../IMAGE_GAME/IMAGE_MAP/MAP1.png').convert()
 key = pygame.image.load('../IMAGE_GAME/IMAGE_MAP/KEY.png')
 passage = pygame.image.load('../IMAGE_GAME/IMAGE_MAP/EXIT.png')
 a = Game(size, screen)
@@ -212,8 +212,8 @@ class Enemy(pg.sprite.Sprite):
         # создание спрайтов для отображения
         self.rect = pg.Rect(self.x_e, self.y_e, ENEMY_WIDTH, ENEMY_HEIGHT)
         # self.image = pg.Surface((ENEMY_WIDTH, ENEMY_HEIGHT))
-        self.image_e = pg.image.load("../IMAGE_GAME/IMAGE_HERO_D/anonimus1.png")
-        self.image_e = pg.transform.scale(self.image_e, (40, 50))
+        self.image = pg.image.load("../IMAGE_GAME/IMAGE_HERO_D/anonimus1.png")
+        self.image = pg.transform.scale(self.image, (40, 50))
         self.yvel = 5
 
     # def movi_enemy(self):
@@ -311,13 +311,13 @@ class Camera:
 
     # сдвинуть объект obj на смещение камеры
     def apply(self, obj):
-        obj.rect.x += self.dx
-        obj.rect.y += self.dy
+        obj.rect.x -= self.dx
+        obj.rect.y -= self.dy
 
     # позиционировать камеру на объекте target
     def update(self, target):
-        self.dx = -(target.rect.x + target.rect.w // 2 - wight // 2)
-        self.dy = -(target.rect.y + target.rect.h // 2 - height // 2)
+        self.dx = a.x_hero - a.xx_hero
+        self.dy = a.y_hero - a.yy_hero
 
 
 
@@ -325,12 +325,10 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):
         super().__init__()
         self.image = a.image_hero
-        self.rect = self.image.get_rect().move(
-            50 * pos_x + 15, 40 * pos_y + 5)
-
+        self.rect = pygame.Rect(pos_x, pos_y, 40, 50)
 
 camera = Camera()
-
+all_sprites = pg.sprite.Group()
 while run:
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
@@ -343,29 +341,38 @@ while run:
         a.key()
     else:
         a.exit()
+    a.copy()
     screen.blit(bg, (0, 0))
     screen.blit(key, (a.coord_key[0], a.coord_key[1]))
     screen.blit(passage, (size[0] - 50, size[1] // 2 - 100))
     keys = pygame.key.get_pressed()
     if 1 in keys:
         a.move(keys)
+    all_sprites = pg.sprite.Group()
+
     # здесь передаем значение методу гравити и джамп для постоянной проверки на каждой итерации
     a.gravity(True)
     a.jump(True)
     # вывод на экран героя
     screen.blit(a.image_hero, (a.x_hero, a.y_hero))
-    # обновление платформ и их вывод
-    player = Player(a.x_hero, a.y_hero)
-    camera.update(player)  # центризируем камеру относительно персонажа
-    for e in entities:
-        camera.apply(e)
-    # entities.draw(screen)
-    a.update(entities)
     # обновление врагов и их вывод
     for i in range(len(x_enemy)):
-        ene = Enemy(x_enemy[x], y_enemy[i])
+        ene = Enemy(x_enemy[i], y_enemy[i])
         ene.update(i, entities)
-        screen.blit(ene.image_e, (ene.x_e, ene.y_e))
+        screen.blit(ene.image, (ene.x_e, ene.y_e))
+        # добавление врагов в общую группу спрайтов
+        all_sprites.add(ene)
+    # добавление платформ в общую группу
+    all_sprites.add(entities)
+    # создание спрайта ирока для работы с камерой
+    player = Player(a.x_hero, a.y_hero)
+    all_sprites.add(player)
+    camera.update(player)  # центризируем камеру относительно персонажа
+    for e in all_sprites:
+        camera.apply(e)
+    # обновление платформ и их вывод
+    entities.draw(screen)
+    a.update(entities)
     clock.tick(60)
     pygame.display.set_caption(f"{clock.get_fps(), a.Hitpoints, (ene.direction)}")
     pygame.display.update()

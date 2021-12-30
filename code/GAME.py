@@ -149,7 +149,7 @@ class Game:
 t = 0
 size = (800, 500)
 screen = pygame.display.set_mode(size)
-bg = pygame.image.load('../IMAGE_GAME/IMAGE_MAP/MAP1.png')
+bg = pygame.image.load('../IMAGE_GAME/IMAGE_MAP/MAP1.png').convert()
 key = pygame.image.load('../IMAGE_GAME/IMAGE_MAP/KEY.png')
 passage = pygame.image.load('../IMAGE_GAME/IMAGE_MAP/EXIT.png')
 a = Game(size, screen)
@@ -329,5 +329,5 @@ while run:
         ene.update(i, entities)
         screen.blit(ene.image_e, (ene.x_e, ene.y_e))
     clock.tick(60)
-    pygame.display.set_caption(f"{clock.get_fps(), a.Hitpoints, (ene.direction)}")
+    pygame.display.set_caption(f"{clock.get_fps(), a.Hitpoints}")
     pygame.display.update()
