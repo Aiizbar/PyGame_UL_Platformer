@@ -6,27 +6,8 @@ pygame.init()
 
 
 
-level = [
-       "--------------------------------",
-       "-                              -",
-       "-                              -",
-       "-                              -",
-       "-                              -",
-       "-                              -",
-       "-                              -",
-       "-      -----     E             -",
-       "-                              -",
-       "-              -----           -",
-       "----                           -",
-       "-                              -",
-       "-       ---        -----       -",
-       "-               E              -",
-       "-                              -",
-       "-               -----          -",
-       "-                              -",
-       "-                              -",
-       "-                              -",
-       "--------------------------------"]
+
+level = open("../MAPS/testMap.txt", mode='r', encoding="utf-8").readlines()
 
 
 
@@ -35,8 +16,8 @@ class Game:
         self.size = size
         self.g = 0
         self.screen = screen
-        self.x_hero = self.wall_x = 40
-        self.y_hero = self.wall_y = 40
+        self.x_hero = self.wall_x = 60
+        self.y_hero = self.wall_y = 60
         self.speed_left = 5
         self.speed_right = 5
         self.key_invent = False
@@ -62,6 +43,7 @@ class Game:
         self.push_range = 0
         self.push_true = False
         self.push_nap = "None"
+        self.xvel = 0
 
     def move(self, keys):
         if keys[pygame.K_ESCAPE]:
@@ -70,11 +52,11 @@ class Game:
             if self.onGround:
                 self.stop_jump = False
         if keys[pygame.K_d]:
-            self.x_hero += self.speed_left
-            self.left = True
+            self.xvel = 5
+            self.x_hero += self.xvel
         elif keys[pygame.K_a]:
-            self.x_hero -= self.speed_right
-            self.right = False
+            self.xvel = -5
+            self.x_hero += self.xvel
 
     def render(self):
         if self.count >= 8:
@@ -118,21 +100,24 @@ class Game:
             self.yvel += GRAVITY
             self.y_hero += self.yvel
 
-    def update(self, e):
+    def update(self, enetis):
         self.rect = pygame.Rect(self.x_hero, self.y_hero, 40, 50)
-        if not pygame.sprite.spritecollideany(self, e):
+        if not pygame.sprite.spritecollideany(self, enetis):
             # если нет столкновения с платформой - падаем вниз
             self.onGround = False
         else:
-            # если есть пересечени с платформой остонавливаем падение
+            # если есть пересечени с платформой останавливаем падение
             self.onGround = True
-            self.yvel = 1
-        # if self.right == True:
-        #     self.speed_right = 0
-        #     self.speed_left = 5
-        # if self.left == True:
-        #     self.speed_left = 0
-        #     self.speed_right = 5
+            self.yvel = 0
+            # if self.xvel > 0:  # если движется вправо
+            #     self.xvel = 0
+            #     self.x_hero -= 5  # то не движется вправо
+            # if self.xvel < 0:  # если движется влево
+            #     self.xvel = 0
+            #     self.x_hero += 5  # то не движется влево
+            # if self.jump_time > 0:
+            #     self.stop_jump = True
+            #     self.y_hero += 10
 
     def jump(self, stop):
         if stop == True and self.stop_jump == False:
@@ -329,5 +314,5 @@ while run:
         ene.update(i, entities)
         screen.blit(ene.image_e, (ene.x_e, ene.y_e))
     clock.tick(60)
-    pygame.display.set_caption(f"{clock.get_fps(), a.Hitpoints}")
+    pygame.display.set_caption(f"{clock.get_fps(), a.Hitpoints, a.xvel}")
     pygame.display.update()
