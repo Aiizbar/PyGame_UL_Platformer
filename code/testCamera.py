@@ -310,9 +310,13 @@ class Camera:
         self.dy = 0
 
     # сдвинуть объект obj на смещение камеры
-    def apply(self, obj):
-        obj.rect.x -= self.dx
-        obj.rect.y -= self.dy
+    def apply(self, obj, what):
+        if what == "blocks":
+            obj.rect.x -= self.dx
+            obj.rect.y -= self.dy
+        if what != "blocks":
+            x_enemy[what] -= self.dx
+            y_enemy[what] -= self.dy
 
     # позиционировать камеру на объекте target
     def update(self, target):
@@ -361,7 +365,7 @@ while run:
         ene.update(i, entities)
         screen.blit(ene.image, (ene.x_e, ene.y_e))
         # добавление врагов в общую группу спрайтов
-        all_sprites.add(ene)
+        # all_sprites.add(ene)
     # добавление платформ в общую группу
     all_sprites.add(entities)
     # создание спрайта ирока для работы с камерой
@@ -369,10 +373,13 @@ while run:
     all_sprites.add(player)
     camera.update(player)  # центризируем камеру относительно персонажа
     for e in all_sprites:
-        camera.apply(e)
+        camera.apply(e, "blocks")
+    for i in range(len(x_enemy)):
+        ene = Enemy(x_enemy[i], y_enemy[i])
+        camera.apply(ene, i)
     # обновление платформ и их вывод
     entities.draw(screen)
     a.update(entities)
     clock.tick(60)
-    pygame.display.set_caption(f"{clock.get_fps(), a.Hitpoints, (ene.direction)}")
+    pygame.display.set_caption(f"{clock.get_fps(), a.Hitpoints}")
     pygame.display.update()
