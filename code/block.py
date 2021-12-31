@@ -15,7 +15,7 @@ class Platform(pg.sprite.Sprite):
         self.image = pg.image.load("../IMAGE_GAME/IMAGE_MAP/TREE.png")
         self.image = pygame.transform.scale(self.image, (25, 25))
         # self.image.fill(pg.Color(PLATFORM_COLOR))
-        self.rect = pg.Rect(x, y, PLATFORM_WIDTH, PLATFORM_HEIGHT)
+        self.rect = pg.Rect(x, y, PLATFORM_WIDTH, PLATFORM_HEIGHT - 5)
 
 
 
@@ -44,7 +44,7 @@ class Up_Platform(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self)
         self.image = pg.image.load("../IMAGE_GAME/IMAGE_MAP/TREE.png")
         self.image = self.image
-        self.rect = pg.Rect(x, y + 20, PLATFORM_WIDTH, 5)
+        self.rect = pg.Rect(x + 7, y + 20, PLATFORM_WIDTH - 7, 5)
 
 # class Down_Platform(pg.sprite.Sprite):
 #     def __init__(self, x, y):

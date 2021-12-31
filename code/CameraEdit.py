@@ -1,11 +1,10 @@
 import sys
-from block import Platform
+from block import *
 import pygame as pg
 import pygame
 import copy
+
 pygame.init()
-
-
 
 level = open("../MAPS/FirstMap.txt", mode='r', encoding="utf-8").readlines()
 
@@ -13,13 +12,11 @@ level = open("../MAPS/FirstMap.txt", mode='r', encoding="utf-8").readlines()
 class Game:
     def __init__(self, size, screen):
         self.size = size
-        self.g = 0
         self.screen = screen
-        self.x_hero = self.wall_x = 40
-        self.y_hero = self.wall_y = 40
+        self.x_hero = self.wall_x = 400
+        self.y_hero = self.wall_y = 250
         self.speed_left = 5
         self.speed_right = 5
-        self.key_invent = False
         self.image_hero_list = [
             pygame.image.load('../IMAGE_GAME/IMAGE_HERO_D/anonimus1.png'),
             pygame.image.load('../IMAGE_GAME/IMAGE_HERO_D/anonimus2.png')]
@@ -27,10 +24,6 @@ class Game:
         self.image_hero_list[1] = pygame.transform.scale(self.image_hero_list[1], (40, 50))
 
         self.count = 0
-        self.coord_key = [600, 600]
-        self.coord_padlock = [size[0] - 50, size[1] // 2 - 100, 50, 150]
-        self.key_finally = (1220, 10)
-        self.speed_key = 10
         self.yvel = 0  # скорость вертикального перемещения
         self.onGround = False  # определяющая на земле мы или нет
         self.gravity(True)
@@ -51,10 +44,8 @@ class Game:
                 self.stop_jump = False
         if keys[pygame.K_d]:
             self.x_hero += self.speed_left
-            self.left = True
         elif keys[pygame.K_a]:
             self.x_hero -= self.speed_right
-            self.right = False
 
     def render(self):
         if self.count >= 8:
@@ -62,51 +53,27 @@ class Game:
         self.image_hero = self.image_hero_list[self.count // 4]
         self.count += 1
 
-    def key(self):
-        self.rect1 = (*self.coord_key, 50, 30)
-        self.rect2 = (self.x_hero, self.y_hero, 55, 129)
-        if self.does_collide():
-            self.g = 1
-        if self.g:
-            if self.coord_key[0] < self.key_finally[0]:
-                self.coord_key[0] += self.speed_key
-            elif self.coord_key[0] > self.key_finally[0]:
-                self.coord_key[0] -= self.speed_key
-            if self.coord_key[1] < self.key_finally[1]:
-                self.coord_key[1] += self.speed_key
-            elif self.coord_key[1] > self.key_finally[1]:
-                self.coord_key[1] -= self.speed_key
-            else:
-                self.key_invent = True
-
-    def exit(self):
-        self.rect1 = self.coord_padlock
-        self.rect2 = (self.x_hero, self.y_hero, 55, 129)
-        if self.does_collide():
-            sys.exit()
-
-    def does_collide(self):
-        if self.rect1[0] < self.rect2[0] + self.rect2[2] and self.rect1[0] + self.rect1[2] > self.rect2[0] \
-                and self.rect1[1] < self.rect2[1] + self.rect2[3] and self.rect1[3] + self.rect1[1] > self.rect2[1]:
-            return True
-        else:
-            return False
-
     def gravity(self, lol):
         GRAVITY = 0.35  # ускорение свободного падения
         if self.onGround == False and lol == True:
             self.yvel += GRAVITY
             self.y_hero += self.yvel
 
-    def update(self, e):
+    def update(self, platforms, left, right, up):
         self.rect = pygame.Rect(self.x_hero, self.y_hero, 40, 50)
-        if not pygame.sprite.spritecollideany(self, e):
-            # если нет столкновения с платформой - падаем вниз
-            self.onGround = False
-        else:
-            # если есть пересечени с платформой остонавливаем падение
+        if pygame.sprite.spritecollideany(self, platforms):
             self.onGround = True
-            self.yvel = 1
+            self.yvel = 0
+        if pygame.sprite.spritecollideany(self, left):
+            self.x_hero -= 5
+        if pygame.sprite.spritecollideany(self, right):
+            self.x_hero += 5
+        # if pygame.sprite.spritecollideany(self, up):
+        #     self.onGround = True
+        #     self.yvel = 0
+        if not pygame.sprite.spritecollideany(self, platforms):
+            # если есть пересечени с платформой останавливаем падение
+            self.onGround = False
 
     def jump(self, stop):
         if stop == True and self.stop_jump == False:
@@ -121,8 +88,6 @@ class Game:
         self.yy_hero = copy.copy(self.y_hero)
 
 
-
-
 # pygame.mixer.music.load('../SOUNDS/sound_bg1.ogg')
 # pygame.mixer.music.play()
 t = 0
@@ -131,25 +96,33 @@ height = 500
 size = (wight, height)
 screen = pygame.display.set_mode(size)
 bg = pygame.image.load('../IMAGE_GAME/IMAGE_MAP/MAP1.png').convert()
-key = pygame.image.load('../IMAGE_GAME/IMAGE_MAP/KEY.png')
-passage = pygame.image.load('../IMAGE_GAME/IMAGE_MAP/EXIT.png')
 a = Game(size, screen)
 clock = pygame.time.Clock()
-run = 1
+run = True
 PLATFORM_WIDTH = 25
 PLATFORM_HEIGHT = 25
 PLATFORM_COLOR = "#FF6262"
-entities = pygame.sprite.Group() # Все объекты-платформы
 # platforms = []
 x = y = 0
 x_enemy = []
 y_enemy = []
 
+entities = pygame.sprite.Group()  # Все объекты-платформы
+Left_plat = pygame.sprite.Group()
+Right_plat = pygame.sprite.Group()
+Up_plat = pygame.sprite.Group()
+
 for row in level:  # вся строка
     for col in row:  # каждый символ
-        if col == "-": # если платформа
-            pf = Platform(x, y)
-            entities.add(pf)
+        if col == "-":  # если платформа
+            pa = Platform(x, y)
+            pl = Left_Platform(x, y)
+            pr = Right_Platform(x, y)
+            pu = Up_Platform(x, y)
+            entities.add(pa)
+            Left_plat.add(pl)
+            Right_plat.add(pr)
+            Up_plat.add(pu)
         elif col == "E":
             # opponent = Enemy(x, y)
             x_enemy.append(x)
@@ -174,7 +147,6 @@ class Attack(pg.sprite.Sprite):
 
 ENEMY_WIDTH = 40
 ENEMY_HEIGHT = 50
-
 
 
 class Enemy(pg.sprite.Sprite):
@@ -210,7 +182,6 @@ class Enemy(pg.sprite.Sprite):
         else:
             self.direction = "None"
         # print(self.direction)
-
 
     def attack(self, visa):
         self.rect = pygame.Rect(a.x_hero, a.y_hero, 40, 50)
@@ -268,7 +239,7 @@ class Enemy(pg.sprite.Sprite):
         self.gravity()
         self.visor()
         if self.direction != "None":
-            self.attack(self.direction) # говорим в какую сторону атаковать
+            self.attack(self.direction)  # говорим в какую сторону атаковать
         self.push_left()
         self.push_right()
         # self.movi_enemy()
@@ -294,10 +265,9 @@ class Camera:
             y_enemy[what] -= self.dy
 
     # позиционировать камеру на объекте target
-    def update(self, target):
-        self.dx = a.x_hero - a.xx_hero
-        self.dy = a.y_hero - a.yy_hero
-
+    def update(self):
+        self.dx = (a.x_hero - a.xx_hero)
+        self.dy = (a.y_hero - a.yy_hero)
 
 
 class Player(pygame.sprite.Sprite):
@@ -305,6 +275,7 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
         self.image = a.image_hero
         self.rect = pygame.Rect(pos_x, pos_y, 40, 50)
+
 
 camera = Camera()
 all_sprites = pg.sprite.Group()
@@ -316,14 +287,10 @@ while run:
         elif event.type == pygame.QUIT:
             run = 0
     a.render()
-    if not a.key_invent:
-        a.key()
-    else:
-        a.exit()
     a.copy()
     screen.blit(bg, (0, 0))
-    screen.blit(key, (a.coord_key[0], a.coord_key[1]))
-    screen.blit(passage, (size[0] - 50, size[1] // 2 - 100))
+    # screen.blit(key, (a.coord_key[0], a.coord_key[1]))
+    # screen.blit(passage, (size[0] - 50, size[1] // 2 - 100))
     keys = pygame.key.get_pressed()
     if 1 in keys:
         a.move(keys)
@@ -341,20 +308,19 @@ while run:
         screen.blit(ene.image, (ene.x_e, ene.y_e))
         # добавление врагов в общую группу спрайтов
         # all_sprites.add(ene)
-    # добавление платформ в общую группу
-    all_sprites.add(entities)
-    # создание спрайта ирока для работы с камерой
+    # добавление платформ в общую группу    # создание спрайта ирока для работы с камерой
     player = Player(a.x_hero, a.y_hero)
+    entities.draw(screen)
+    a.update(entities, Left_plat, Right_plat, Up_plat)
+    clock.tick(60)
+    pygame.display.set_caption(f"{clock.get_fps(), a.Hitpoints}")
     all_sprites.add(player)
-    camera.update(player)  # центризируем камеру относительно персонажа
+    all_sprites.add(entities)
+    camera.update()  # центризируем камеру относительно персонажа
     for e in all_sprites:
         camera.apply(e, "blocks")
     for i in range(len(x_enemy)):
         ene = Enemy(x_enemy[i], y_enemy[i])
         camera.apply(ene, i)
     # обновление платформ и их вывод
-    entities.draw(screen)
-    a.update(entities)
-    clock.tick(60)
-    pygame.display.set_caption(f"{clock.get_fps(), a.Hitpoints}")
     pygame.display.update()

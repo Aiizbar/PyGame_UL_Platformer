@@ -1,5 +1,5 @@
 import sys
-from block import Platform
+from block import *
 import pygame as pg
 import pygame
 pygame.init()
@@ -100,24 +100,20 @@ class Game:
             self.yvel += GRAVITY
             self.y_hero += self.yvel
 
-    def update(self, enetis):
+    def update(self, platforms, left, right, up):
         self.rect = pygame.Rect(self.x_hero, self.y_hero, 40, 50)
-        if not pygame.sprite.spritecollideany(self, enetis):
-            # если нет столкновения с платформой - падаем вниз
-            self.onGround = False
-        else:
-            # если есть пересечени с платформой останавливаем падение
+        if pygame.sprite.spritecollideany(self, platforms):
             self.onGround = True
             self.yvel = 0
-            # if self.xvel > 0:  # если движется вправо
-            #     self.xvel = 0
-            #     self.x_hero -= 5  # то не движется вправо
-            # if self.xvel < 0:  # если движется влево
-            #     self.xvel = 0
-            #     self.x_hero += 5  # то не движется влево
-            # if self.jump_time > 0:
-            #     self.stop_jump = True
-            #     self.y_hero += 10
+        if pygame.sprite.spritecollideany(self, left):
+            self.x_hero -= 5
+        if pygame.sprite.spritecollideany(self, right):
+            self.x_hero += 5
+        # if pygame.sprite.spritecollideany(self, up):
+        #     self.y_hero += 10
+        if not pygame.sprite.spritecollideany(self, platforms):
+            # если есть пересечени с платформой останавливаем падение
+            self.onGround = False
 
     def jump(self, stop):
         if stop == True and self.stop_jump == False:
@@ -149,11 +145,21 @@ x = y = 0
 x_enemy = []
 y_enemy = []
 
+Left_plat = pygame.sprite.Group()
+Right_plat = pygame.sprite.Group()
+Up_plat = pygame.sprite.Group()
+
 for row in level:  # вся строка
     for col in row:  # каждый символ
         if col == "-": # если платформа
-            pf = Platform(x, y)
-            entities.add(pf)
+            pa = Platform(x, y)
+            pl = Left_Platform(x, y)
+            pr = Right_Platform(x, y)
+            pu = Up_Platform(x, y)
+            entities.add(pa)
+            Left_plat.add(pl)
+            Right_plat.add(pr)
+            Up_plat.add(pu)
         elif col == "E":
             # opponent = Enemy(x, y)
             x_enemy.append(x)
@@ -307,7 +313,7 @@ while run:
     screen.blit(a.image_hero, (a.x_hero, a.y_hero))
     # обновление платформ и их вывод
     entities.draw(screen)
-    a.update(entities)
+    a.update(entities, Left_plat, Right_plat, Up_plat)
     # обновление врагов и их вывод
     for i in range(len(x_enemy)):
         ene = Enemy(x_enemy[i], y_enemy[i])
