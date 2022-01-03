@@ -1,5 +1,6 @@
 import sys
 from block import *
+from Settings import *
 import pygame as pg
 import pygame
 pygame.init()
@@ -125,22 +126,9 @@ class Game:
 
 
 
-# pygame.mixer.music.load('../SOUNDS/sound_bg1.ogg')
-# pygame.mixer.music.play()
-t = 0
-size = (800, 500)
-screen = pygame.display.set_mode(size)
-bg = pygame.image.load('../IMAGE_GAME/IMAGE_MAP/MAP1.png').convert()
-key = pygame.image.load('../IMAGE_GAME/IMAGE_MAP/KEY.png')
-passage = pygame.image.load('../IMAGE_GAME/IMAGE_MAP/EXIT.png')
+
 a = Game(size, screen)
-clock = pygame.time.Clock()
-run = 1
-PLATFORM_WIDTH = 25
-PLATFORM_HEIGHT = 25
-PLATFORM_COLOR = "#FF6262"
 entities = pygame.sprite.Group() # Все объекты-платформы
-# platforms = []
 x = y = 0
 x_enemy = []
 y_enemy = []
@@ -301,8 +289,6 @@ while run:
     else:
         a.exit()
     screen.blit(bg, (0, 0))
-    screen.blit(key, (a.coord_key[0], a.coord_key[1]))
-    screen.blit(passage, (size[0] - 50, size[1] // 2 - 100))
     keys = pygame.key.get_pressed()
     if 1 in keys:
         a.move(keys)

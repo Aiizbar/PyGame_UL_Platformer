@@ -1,5 +1,6 @@
 import pygame as pg
 import pygame.draw
+from Settings import *
 
 pg.init()
 PLATFORM_WIDTH = 25
@@ -10,12 +11,21 @@ PLATFORM_COLOR = "#FF6262"
 
 class Platform(pg.sprite.Sprite):
     def __init__(self, x, y):
+        self.x = x
+        self.y = y
         pg.sprite.Sprite.__init__(self)
         # self.image = pg.Surface((PLATFORM_WIDTH, PLATFORM_HEIGHT))
-        self.image = pg.image.load("../IMAGE_GAME/IMAGE_MAP/TREE.png")
+        self.image = pg.image.load("../IMAGE_GAME/IMAGE_MAP/set.png")
         self.image = pygame.transform.scale(self.image, (25, 25))
         # self.image.fill(pg.Color(PLATFORM_COLOR))
         self.rect = pg.Rect(x, y, PLATFORM_WIDTH, PLATFORM_HEIGHT - 5)
+
+    def drow(self):
+        # Platform
+        pygame.draw.rect(screen,  (0, 0, 0), (self.x, self.y, PLATFORM_WIDTH, PLATFORM_HEIGHT - 5))
+        pygame.draw.rect(screen, (0, 0, 255), (self.x, self.y + 10, 5, 10))
+        pygame.draw.rect(screen, (255, 0, 0), (self.x + 20, self.y + 10, 5, 10))
+
 
 
 

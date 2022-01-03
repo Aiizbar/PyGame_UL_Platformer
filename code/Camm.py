@@ -61,7 +61,7 @@ class Game:
             self.y_hero += self.yvel
 
     def update(self, platforms, left, right, up):
-        self.rect = pygame.Rect(self.x_hero, self.y_hero, 40, 50)
+        self.rect = pygame.Rect(aa, bb, 40, 50)
         if pygame.sprite.spritecollideany(self, platforms):
             self.onGround = True
             self.yvel = 0
@@ -159,7 +159,7 @@ class Enemy(pg.sprite.Sprite):
             x_enemy[self.typ] -= self.speed_enemy
 
     def visor(self):
-        self.rect = pygame.Rect(a.x_hero, a.y_hero, 40, 50)
+        self.rect = pygame.Rect(aa, bb, 40, 50)
         R = pygame.sprite.Group()
         L = pygame.sprite.Group()
         left_visor = Attack(x_enemy[self.typ] - 120, y_enemy[self.typ], 120, 3)
@@ -175,7 +175,7 @@ class Enemy(pg.sprite.Sprite):
         # print(self.direction)
 
     def attack(self, visa):
-        self.rect = pygame.Rect(a.x_hero, a.y_hero, 40, 50)
+        self.rect = pygame.Rect(aa, bb, 40, 50)
         if visa == "Right":
             rect_Player = Attack(x_enemy[self.typ] + 30, y_enemy[self.typ], 30, 30)
             DD = pygame.sprite.Group()
@@ -292,8 +292,8 @@ while run:
     a.gravity(True)
     a.jump(True)
     # вывод на экран героя
-    screen.blit(a.image_hero, (a.x_hero, a.y_hero))
-    # screen.blit(a.image_hero, (400, 250))
+    # screen.blit(a.image_hero, (a.x_hero, a.y_hero))
+    screen.blit(a.image_hero, (400, 250))
     # обновление врагов и их вывод
     for i in range(len(x_enemy)):
         ene = Enemy(x_enemy[i], y_enemy[i])
