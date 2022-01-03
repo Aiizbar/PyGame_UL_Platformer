@@ -7,7 +7,7 @@ import copy
 
 pygame.init()
 
-level = open("../MAPS/FirstMap.txt", mode='r', encoding="utf-8").readlines()
+level = open("../MAPS/SecondMap.txt", mode='r', encoding="utf-8").readlines()
 
 
 class Game:
@@ -60,7 +60,7 @@ class Game:
             self.yvel += GRAVITY
             self.y_hero += self.yvel
 
-    def update(self, platforms, left, right, up):
+    def update(self, platforms, left, right, up, pp):
         self.rect = pygame.Rect(aa, bb, 40, 50)
         if pygame.sprite.spritecollideany(self, platforms):
             self.onGround = True
@@ -75,6 +75,8 @@ class Game:
         if not pygame.sprite.spritecollideany(self, platforms):
             # если есть пересечени с платформой останавливаем падение
             self.onGround = False
+        if pygame.sprite.spritecollideany(self, pp):
+            self.y_hero -= 1
 
     def jump(self, stop):
         if stop == True and self.stop_jump == False:
@@ -99,6 +101,7 @@ entities = pygame.sprite.Group()  # Все объекты-платформы
 Left_plat = pygame.sprite.Group()
 Right_plat = pygame.sprite.Group()
 Up_plat = pygame.sprite.Group()
+PP_plat = pygame.sprite.Group()
 
 for row in level:  # вся строка
     for col in row:  # каждый символ
@@ -107,10 +110,12 @@ for row in level:  # вся строка
             pl = Left_Platform(x, y)
             pr = Right_Platform(x, y)
             pu = Up_Platform(x, y)
+            pp = PP_Platform(x, y)
             entities.add(pa)
             Left_plat.add(pl)
             Right_plat.add(pr)
             Up_plat.add(pu)
+            PP_plat.add(pp)
         elif col == "E":
             # opponent = Enemy(x, y)
             x_enemy.append(x)
@@ -304,18 +309,20 @@ while run:
     # добавление платформ в общую группу    # создание спрайта ирока для работы с камерой
     player = Player(a.x_hero, a.y_hero)
     entities.draw(screen)
-    a.update(entities, Left_plat, Right_plat, Up_plat)
+    a.update(entities, Left_plat, Right_plat, Up_plat, PP_plat)
     clock.tick(60)
     pygame.display.set_caption(f"{clock.get_fps(), a.Hitpoints}")
     all_sprites.add(player)
     all_sprites.add(entities)
     all_sprites.add(Left_plat)
     all_sprites.add(Right_plat)
+    all_sprites.add(PP_plat)
     camera.update()  # центризируем камеру относительно персонажа
     for e in all_sprites:
         camera.apply(e, "blocks")
     for i in range(len(x_enemy)):
         ene = Enemy(x_enemy[i], y_enemy[i])
         camera.apply(ene, i)
-    # обновление платформ и их вывод
+    # обновление платформ и их выво
+
     pygame.display.update()
