@@ -35,7 +35,7 @@ class PP_Platform(pg.sprite.Sprite):
         self.image = pg.image.load("../IMAGE_GAME/IMAGE_MAP/TREE.png")
         self.image = self.image
         # self.image.fill(pg.Color(PLATFORM_COLOR))
-        self.rect = pg.Rect(x, y - 1, PLATFORM_WIDTH, PLATFORM_HEIGHT - 5)
+        self.rect = pg.Rect(x, y - 5, PLATFORM_WIDTH, PLATFORM_HEIGHT - 10)
 
 
 
