@@ -1,13 +1,13 @@
 import sys
 from block import *
 from Settings import *
+from Player import Player
+from Door import Door
 import pygame as pg
 import pygame
 import copy
 
 pygame.init()
-
-level = open("../MAPS/FirstMap.txt", mode='r', encoding="utf-8").readlines()
 
 
 class Game:
@@ -36,6 +36,17 @@ class Game:
         self.push_range = 0
         self.push_true = False
         self.push_nap = "None"
+        self.plats()
+        self.ThisIsMap = 0
+
+        #
+    def plats(self):
+        self.entities = pygame.sprite.Group()  # Все объекты-платформы
+        self.Left_plat = pygame.sprite.Group()
+        self.Right_plat = pygame.sprite.Group()
+        self.Up_plat = pygame.sprite.Group()
+        self.PP_plat = pygame.sprite.Group()
+        self.ThisDoor = pygame.sprite.Group()
 
     def move(self, keys):
         if keys[pygame.K_ESCAPE]:
@@ -90,40 +101,56 @@ class Game:
         self.xx_hero = copy.copy(self.x_hero)
         self.yy_hero = copy.copy(self.y_hero)
 
+    def IfNextLevel(self):
+        self.rect = pygame.Rect(aa, bb, 40, 50)
+        if HaveKey == True:
+            if pygame.sprite.spritecollideany(self, a.ThisDoor):
+                self.plats()
+                self.ThisIsMap += 1
+                level = open(f"../MAPS/{allMap[self.ThisIsMap]}", mode='r', encoding="utf-8").readlines()
+                mapping(level)
 
 
 a = Game(size, screen)
-x = y = 0
 x_enemy = []
 y_enemy = []
 
-entities = pygame.sprite.Group()  # Все объекты-платформы
-Left_plat = pygame.sprite.Group()
-Right_plat = pygame.sprite.Group()
-Up_plat = pygame.sprite.Group()
-PP_plat = pygame.sprite.Group()
+# entities = pygame.sprite.Group()  # Все объекты-платформы
+# Left_plat = pygame.sprite.Group()
+# Right_plat = pygame.sprite.Group()
+# Up_plat = pygame.sprite.Group()
+# PP_plat = pygame.sprite.Group()
+# ThisDoor = pygame.sprite.Group()
+def mapping(level):
+    x = y = 0
+    for row in level:  # вся строка
+        for col in row:  # каждый символ
+            if col == "-":  # если платформа
+                pa = Platform(x, y)
+                pl = Left_Platform(x, y)
+                pr = Right_Platform(x, y)
+                pu = Up_Platform(x, y)
+                pp = PP_Platform(x, y)
+                a.entities.add(pa)
+                a.Left_plat.add(pl)
+                a.Right_plat.add(pr)
+                a.Up_plat.add(pu)
+                a.PP_plat.add(pp)
+            elif col == "E":
+                # opponent = Enemy(x, y)
+                x_enemy.append(x)
+                y_enemy.append(y)
+                # adversary.add(opponent)
+            elif col == "D":
+                nextLevel = Door(x, y)
+                a.ThisDoor.add(nextLevel)
+            x += PLATFORM_WIDTH
+        y += PLATFORM_HEIGHT
+        x = 0
+    # for i in range(len(x_enemy)):
+    #     opponent = Enemy(x_enemy[i], y_enemy[i])
 
-for row in level:  # вся строка
-    for col in row:  # каждый символ
-        if col == "-":  # если платформа
-            pa = Platform(x, y)
-            pl = Left_Platform(x, y)
-            pr = Right_Platform(x, y)
-            pu = Up_Platform(x, y)
-            pp = PP_Platform(x, y)
-            entities.add(pa)
-            Left_plat.add(pl)
-            Right_plat.add(pr)
-            Up_plat.add(pu)
-            PP_plat.add(pp)
-        elif col == "E":
-            # opponent = Enemy(x, y)
-            x_enemy.append(x)
-            y_enemy.append(y)
-            # adversary.add(opponent)
-        x += PLATFORM_WIDTH
-    y += PLATFORM_HEIGHT
-    x = 0
+mapping(level)
 
 
 class Attack(pg.sprite.Sprite):
@@ -271,11 +298,13 @@ class Camera:
         self.dy = (a.y_hero - a.yy_hero)
 
 
-class Player(pygame.sprite.Sprite):
-    def __init__(self, pos_x, pos_y):
-        super().__init__()
-        self.image = a.image_hero
-        self.rect = pygame.Rect(pos_x, pos_y, 40, 50)
+# def IfNextLevel():
+#     rect = pygame.Rect(400, 250, 40, 50)
+#     if HaveKey == True:
+#         if pygame.sprite.spritecollideany(rect1, ThisDoor):
+#             # ThisIsMap += 1
+#             level = open(f"../MAPS/{allMap[1]}", mode='r', encoding="utf-8").readlines()
+#             mapping(level)
 
 
 camera = Camera()
@@ -306,27 +335,34 @@ while run:
     # обновление врагов и их вывод
     for i in range(len(x_enemy)):
         ene = Enemy(x_enemy[i], y_enemy[i])
-        ene.update(i, entities)
+        ene.update(i, a.entities)
         screen.blit(ene.image, (ene.x_e, ene.y_e))
         # добавление врагов в общую группу спрайтов
         # all_sprites.add(ene)
-    # добавление платформ в общую группу    # создание спрайта ирока для работы с камерой
+
+    # создание спрайта ирока для работы с камерой
     player = Player(a.x_hero, a.y_hero)
-    entities.draw(screen)
-    a.update(entities, Left_plat, Right_plat, Up_plat, PP_plat)
-    clock.tick(60)
-    pygame.display.set_caption(f"{clock.get_fps(), a.Hitpoints}")
+    # обновление платформ и их вывод
+    a.entities.draw(screen)
+    a.update(a.entities, a.Left_plat, a.Right_plat, a.Up_plat, a.PP_plat)
+    a.ThisDoor.draw(screen)
+    # добавление всех спратов в общую группу
     all_sprites.add(player)
-    all_sprites.add(entities)
-    all_sprites.add(Left_plat)
-    all_sprites.add(Right_plat)
-    all_sprites.add(PP_plat)
+    all_sprites.add(a.entities)
+    all_sprites.add(a.Left_plat)
+    all_sprites.add(a.Right_plat)
+    all_sprites.add(a.PP_plat)
+    all_sprites.add(a.ThisDoor)
     camera.update()  # центризируем камеру относительно персонажа
     for e in all_sprites:
         camera.apply(e, "blocks")
     for i in range(len(x_enemy)):
         ene = Enemy(x_enemy[i], y_enemy[i])
         camera.apply(ene, i)
-    # обновление платформ и их выво
 
+    # проверка есть ли ключ и столкновение с дверью
+    a.IfNextLevel()
+
+    clock.tick(60)
+    pygame.display.set_caption(f"{clock.get_fps(), a.Hitpoints}")
     pygame.display.update()
