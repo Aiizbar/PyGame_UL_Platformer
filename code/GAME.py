@@ -225,7 +225,7 @@ class Enemy(pg.sprite.Sprite):
                 a.push_true = True
                 a.push_nap = "Left"
 
-    def walls(self, e):
+    def walls(self, e, pp):
         self.rect = pygame.Rect(x_enemy[self.typ], y_enemy[self.typ], 40, 50)
         if not pygame.sprite.spritecollideany(self, e):
             # если нет столкновения с платформой - падаем вниз
@@ -233,10 +233,31 @@ class Enemy(pg.sprite.Sprite):
         else:
             # если есть пересечени с платформой остонавливаем падение
             self.onGround = True
+        if pygame.sprite.spritecollideany(self, pp):
+            y_enemy[self.typ] -= 1
+
 
     def gravity(self):
         if self.onGround == False:
+            print("Падает враг!")
             y_enemy[self.typ] += self.yvel
+
+    # def walls(self, i, platforms, left, right, up, pp):
+    #     self.rect = pygame.Rect(aa, bb, 40, 50)
+    #     if pygame.sprite.spritecollideany(self, platforms):
+    #         self.onGround = True
+    #     if pygame.sprite.spritecollideany(self, left):
+    #         x_enemy[i] -= 5
+    #     if pygame.sprite.spritecollideany(self, right):
+    #         x_enemy[i] += 5
+    #     # if pygame.sprite.spritecollideany(self, up):
+    #     #     self.onGround = True
+    #     #     self.yvel = 0
+    #     if not pygame.sprite.spritecollideany(self, platforms):
+    #         # если есть пересечени с платформой останавливаем падение
+    #         self.onGround = False
+    #     if pygame.sprite.spritecollideany(self, pp):
+    #         y_enemy[i] -= 2
 
     def push_left(self):
         if a.push_range <= 10 and a.push_true == True and a.push_nap == "Left":
@@ -256,9 +277,9 @@ class Enemy(pg.sprite.Sprite):
                 a.push_true = False
                 a.push_nap = "None"
 
-    def update(self, i, wall):
+    def update(self, i, platforms, left, right, up, pp):
         self.typ = i
-        self.walls(wall)
+        self.walls(platforms, pp)
         self.gravity()
         self.visor()
         if self.direction != "None":
@@ -335,7 +356,8 @@ while run:
     # обновление врагов и их вывод
     for i in range(len(x_enemy)):
         ene = Enemy(x_enemy[i], y_enemy[i])
-        ene.update(i, a.entities)
+        # ene.walls(i, a.entities, a.Left_plat, a.Right_plat, a.Up_plat, a.PP_plat)
+        ene.update(i, a.entities, a.Left_plat, a.Right_plat, a.Up_plat, a.PP_plat)
         screen.blit(ene.image, (ene.x_e, ene.y_e))
         # добавление врагов в общую группу спрайтов
         # all_sprites.add(ene)
@@ -364,5 +386,5 @@ while run:
     a.IfNextLevel()
 
     clock.tick(60)
-    pygame.display.set_caption(f"{clock.get_fps(), a.Hitpoints}")
+    pygame.display.set_caption(f"{int(clock.get_fps()), allMap[a.ThisIsMap]}")
     pygame.display.update()

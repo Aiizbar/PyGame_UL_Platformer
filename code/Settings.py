@@ -17,9 +17,9 @@ PLATFORM_WIDTH = 50
 PLATFORM_HEIGHT = 50
 PLATFORM_COLOR = "#FF6262"
 
-allMap = ["FirstMAp.txt", "SecondMap.txt", ""]
+allMap = ["FirstMap.txt", "SecondMap.txt", "BossMap.txt"]
 HaveKey = True
-level = open("../MAPS/TestMap.txt", mode='r', encoding="utf-8").readlines()
+level = open("../MAPS/FirstMap.txt", mode='r', encoding="utf-8").readlines()
 
 aa = 400
 bb = 250

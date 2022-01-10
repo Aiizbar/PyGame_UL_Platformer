@@ -3,8 +3,8 @@ import pygame.draw
 from Settings import *
 
 pg.init()
-PLATFORM_WIDTH = 50
-PLATFORM_HEIGHT = 50
+# PLATFORM_WIDTH = 50
+# PLATFORM_HEIGHT = 50
 PLATFORM_COLOR = "#FF6262"
 
 
