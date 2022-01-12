@@ -5,6 +5,7 @@ from Player import Player
 from Door import Door
 import pygame as pg
 import pygame
+import pygame_menu
 import copy
 
 pygame.init()
@@ -80,9 +81,9 @@ class Game:
             self.x_hero -= 5
         if pygame.sprite.spritecollideany(self, right):
             self.x_hero += 5
-        # if pygame.sprite.spritecollideany(self, up):
-        #     self.onGround = True
-        #     self.yvel = 0
+        if pygame.sprite.spritecollideany(self, up):
+            self.y_hero += 10
+            # self.yvel = 0
         if not pygame.sprite.spritecollideany(self, platforms):
             # если есть пересечени с платформой останавливаем падение
             self.onGround = False
@@ -129,13 +130,16 @@ def mapping(level):
                 pa = Platform(x, y)
                 pl = Left_Platform(x, y)
                 pr = Right_Platform(x, y)
-                pu = Up_Platform(x, y)
+                # pu = Up_Platform(x, y)
                 pp = PP_Platform(x, y)
                 a.entities.add(pa)
                 a.Left_plat.add(pl)
                 a.Right_plat.add(pr)
-                a.Up_plat.add(pu)
+                # a.Up_plat.add(pu)
                 a.PP_plat.add(pp)
+            elif col == "_":
+                pu = Up_Platform(x, y)
+                a.Up_plat.add(pu)
             elif col == "E":
                 # opponent = Enemy(x, y)
                 x_enemy.append(x)
@@ -319,13 +323,23 @@ class Camera:
         self.dy = (a.y_hero - a.yy_hero)
 
 
-# def IfNextLevel():
-#     rect = pygame.Rect(400, 250, 40, 50)
-#     if HaveKey == True:
-#         if pygame.sprite.spritecollideany(rect1, ThisDoor):
-#             # ThisIsMap += 1
-#             level = open(f"../MAPS/{allMap[1]}", mode='r', encoding="utf-8").readlines()
-#             mapping(level)
+# surface = pygame.display.set_mode((600, 400))
+#
+# def set_difficulty(value, difficulty):
+#     # Do the job here !
+#     pass
+#
+# def start_the_game():
+#     run = True
+#
+# menu = pygame_menu.Menu('Welcome', 400, 300,
+#                        theme=pygame_menu.themes.THEME_BLUE)
+#
+# # menu.add.text_input('Name :', default='John Doe')
+# # menu.add.selector('Difficulty :', [('Hard', 1), ('Easy', 2)], onchange=set_difficulty)
+# menu.add.button('Play', start_the_game)
+# menu.add.button('Quit', pygame_menu.events.EXIT)
+# menu.mainloop(surface)
 
 
 camera = Camera()
@@ -368,11 +382,13 @@ while run:
     a.entities.draw(screen)
     a.update(a.entities, a.Left_plat, a.Right_plat, a.Up_plat, a.PP_plat)
     a.ThisDoor.draw(screen)
+    # a.Up_plat.draw(screen)
     # добавление всех спратов в общую группу
     all_sprites.add(player)
     all_sprites.add(a.entities)
     all_sprites.add(a.Left_plat)
     all_sprites.add(a.Right_plat)
+    all_sprites.add(a.Up_plat)
     all_sprites.add(a.PP_plat)
     all_sprites.add(a.ThisDoor)
     camera.update()  # центризируем камеру относительно персонажа

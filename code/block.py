@@ -61,14 +61,14 @@ class Right_Platform(pg.sprite.Sprite):
 class Up_Platform(pg.sprite.Sprite):
     def __init__(self, x, y):
         pg.sprite.Sprite.__init__(self)
-        self.image = pg.image.load("../IMAGE_GAME/IMAGE_MAP/TREE.png")
+        self.image = pg.image.load("../IMAGE_GAME/IMAGE_MAP/set.png")
         self.image = self.image
         self.rect = pg.Rect(x + 7 * 2, y + 2 * 2, PLATFORM_WIDTH - 7, 5)
 
-# class Down_Platform(pg.sprite.Sprite):
-#     def __init__(self, x, y):
-#         pg.sprite.Sprite.__init__(self)
-#         self.image = pg.image.load("../IMAGE_GAME/IMAGE_MAP/TREE.png")
-#         self.image = self.image
-#         # self.image.fill(pg.Color(PLATFORM_COLOR))
-#         self.rect = pg.Rect(x, y, PLATFORM_WIDTH, 1)
+class Down_Platform(pg.sprite.Sprite):
+    def __init__(self, x, y):
+        pg.sprite.Sprite.__init__(self)
+        self.image = pg.image.load("../IMAGE_GAME/IMAGE_MAP/set.png")
+        self.image = self.image
+        # self.image.fill(pg.Color(PLATFORM_COLOR))
+        self.rect = pg.Rect(x, y, PLATFORM_WIDTH, 1)
