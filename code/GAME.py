@@ -2,7 +2,7 @@ import sys
 from block import *
 from Settings import *
 from Player import Player
-from Door import Door
+from Door import *
 import pygame as pg
 import pygame
 import pygame_menu
@@ -73,7 +73,7 @@ class Game:
             self.y_hero += self.yvel
 
     def update(self, platforms, left, right, up, pp):
-        self.rect = pygame.Rect(aa, bb, 40, 50)
+        self.rect = pygame.Rect(700, self.y_hero, 40, 50)
         if pygame.sprite.spritecollideany(self, platforms):
             self.onGround = True
             self.yvel = 0
@@ -103,7 +103,7 @@ class Game:
         self.yy_hero = copy.copy(self.y_hero)
 
     def IfNextLevel(self):
-        self.rect = pygame.Rect(aa, bb, 40, 50)
+        self.rect = pygame.Rect(700, self.y_hero, 40, 50)
         if HaveKey == True:
             if pygame.sprite.spritecollideany(self, a.ThisDoor):
                 self.plats()
@@ -148,6 +148,8 @@ def mapping(level):
             elif col == "D":
                 nextLevel = Door(x, y)
                 a.ThisDoor.add(nextLevel)
+            elif col == "K":
+                ThisKey = Key(x, y)
             x += PLATFORM_WIDTH
         y += PLATFORM_HEIGHT
         x = 0
@@ -195,7 +197,7 @@ class Enemy(pg.sprite.Sprite):
             x_enemy[self.typ] -= self.speed_enemy
 
     def visor(self):
-        self.rect = pygame.Rect(aa, bb, 40, 50)
+        self.rect = pygame.Rect(700, a.y_hero, 40, 50)
         R = pygame.sprite.Group()
         L = pygame.sprite.Group()
         left_visor = Attack(x_enemy[self.typ] - 120, y_enemy[self.typ], 120, 3)
@@ -211,7 +213,7 @@ class Enemy(pg.sprite.Sprite):
         # print(self.direction)
 
     def attack(self, visa):
-        self.rect = pygame.Rect(aa, bb, 40, 50)
+        self.rect = pygame.Rect(700, a.y_hero, 40, 50)
         if visa == "Right":
             rect_Player = Attack(x_enemy[self.typ] + 30, y_enemy[self.typ], 30, 30)
             DD = pygame.sprite.Group()
@@ -243,7 +245,6 @@ class Enemy(pg.sprite.Sprite):
 
     def gravity(self):
         if self.onGround == False:
-            print("Падает враг!")
             y_enemy[self.typ] += self.yvel
 
     # def walls(self, i, platforms, left, right, up, pp):
@@ -291,7 +292,7 @@ class Enemy(pg.sprite.Sprite):
             self.movi_enemy(self.direction)
         self.push_left()
         self.push_right()
-        # self.movi_enemy()
+        self.movi_enemy(self.direction)
 
 
 for i in range(len(x_enemy)):
@@ -307,100 +308,95 @@ class Camera:
     # сдвинуть объект obj на смещение камеры
     def apply(self, obj, what):
         if what == "blocks":
-            # if obj.rect.y >= 0:
-                obj.rect.x -= self.dx
-                obj.rect.y -= self.dy
-            # else:
-            #     obj.rect.x += self.dx
-            #     obj.rect.y += self.dy
+            obj.rect.x -= self.dx
+            # obj.rect.y -= self.dy
         if what != "blocks":
             x_enemy[what] -= self.dx
-            y_enemy[what] -= self.dy
-
+            # y_enemy[what] -= self.dy
     # позиционировать камеру на объекте target
     def update(self):
         self.dx = (a.x_hero - a.xx_hero)
         self.dy = (a.y_hero - a.yy_hero)
 
 
-# surface = pygame.display.set_mode((600, 400))
-#
-# def set_difficulty(value, difficulty):
-#     # Do the job here !
-#     pass
-#
-# def start_the_game():
-#     run = True
-#
-# menu = pygame_menu.Menu('Welcome', 400, 300,
-#                        theme=pygame_menu.themes.THEME_BLUE)
-#
-# # menu.add.text_input('Name :', default='John Doe')
-# # menu.add.selector('Difficulty :', [('Hard', 1), ('Easy', 2)], onchange=set_difficulty)
-# menu.add.button('Play', start_the_game)
-# menu.add.button('Quit', pygame_menu.events.EXIT)
-# menu.mainloop(surface)
-
 
 camera = Camera()
 all_sprites = pg.sprite.Group()
-while run:
-    for event in pygame.event.get():
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                run = 0
-        elif event.type == pygame.QUIT:
-            run = 0
-    a.render()
-    a.copy()
-    screen.blit(bg, (0, 0))
-    # screen.blit(key, (a.coord_key[0], a.coord_key[1]))
-    # screen.blit(passage, (size[0] - 50, size[1] // 2 - 100))
-    keys = pygame.key.get_pressed()
-    if 1 in keys:
-        a.move(keys)
-    all_sprites = pg.sprite.Group()
+def GAME():
+    while 1:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    sys.exit()
+            elif event.type == pygame.QUIT:
+                sys.exit()
+        a.render()
+        a.copy()
+        screen.blit(bg, (0, 0))
+        keys = pygame.key.get_pressed()
+        if 1 in keys:
+            a.move(keys)
+        all_sprites = pg.sprite.Group()
+        # здесь передаем значение методу гравити и джамп для постоянной проверки на каждой итерации
+        a.gravity(True)
+        a.jump(True)
+        # вывод на экран героя
+        # screen.blit(a.image_hero, (a.x_hero, a.y_hero))
+        screen.blit(a.image_hero, (700, a.y_hero))
+        # обновление врагов и их вывод
+        for i in range(len(x_enemy)):
+            ene = Enemy(x_enemy[i], y_enemy[i])
+            # ene.walls(i, a.entities, a.Left_plat, a.Right_plat, a.Up_plat, a.PP_plat)
+            ene.update(i, a.entities, a.Left_plat, a.Right_plat, a.Up_plat, a.PP_plat)
+            screen.blit(ene.image, (ene.x_e, ene.y_e))
+            # добавление врагов в общую группу спрайтов
+            # all_sprites.add(ene)
 
-    # здесь передаем значение методу гравити и джамп для постоянной проверки на каждой итерации
-    a.gravity(True)
-    a.jump(True)
-    # вывод на экран героя
-    # screen.blit(a.image_hero, (a.x_hero, a.y_hero))
-    screen.blit(a.image_hero, (400, 250))
-    # обновление врагов и их вывод
-    for i in range(len(x_enemy)):
-        ene = Enemy(x_enemy[i], y_enemy[i])
-        # ene.walls(i, a.entities, a.Left_plat, a.Right_plat, a.Up_plat, a.PP_plat)
-        ene.update(i, a.entities, a.Left_plat, a.Right_plat, a.Up_plat, a.PP_plat)
-        screen.blit(ene.image, (ene.x_e, ene.y_e))
-        # добавление врагов в общую группу спрайтов
-        # all_sprites.add(ene)
+        # создание спрайта ирока для работы с камерой
+        player = Player(a.x_hero, a.y_hero)
+        # обновление платформ и их вывод
+        a.entities.draw(screen)
+        a.update(a.entities, a.Left_plat, a.Right_plat, a.Up_plat, a.PP_plat)
+        a.ThisDoor.draw(screen)
+        a.Up_plat.draw(screen)
+        # добавление всех спратов в общую группу
+        all_sprites.add(player)
+        all_sprites.add(a.entities)
+        all_sprites.add(a.Left_plat)
+        all_sprites.add(a.Right_plat)
+        all_sprites.add(a.Up_plat)
+        all_sprites.add(a.PP_plat)
+        all_sprites.add(a.ThisDoor)
+        camera.update()  # центризируем камеру относительно персонажа
+        for e in all_sprites:
+            camera.apply(e, "blocks")
+        for i in range(len(x_enemy)):
+            ene = Enemy(x_enemy[i], y_enemy[i])
+            camera.apply(ene, i)
 
-    # создание спрайта ирока для работы с камерой
-    player = Player(a.x_hero, a.y_hero)
-    # обновление платформ и их вывод
-    a.entities.draw(screen)
-    a.update(a.entities, a.Left_plat, a.Right_plat, a.Up_plat, a.PP_plat)
-    a.ThisDoor.draw(screen)
-    # a.Up_plat.draw(screen)
-    # добавление всех спратов в общую группу
-    all_sprites.add(player)
-    all_sprites.add(a.entities)
-    all_sprites.add(a.Left_plat)
-    all_sprites.add(a.Right_plat)
-    all_sprites.add(a.Up_plat)
-    all_sprites.add(a.PP_plat)
-    all_sprites.add(a.ThisDoor)
-    camera.update()  # центризируем камеру относительно персонажа
-    for e in all_sprites:
-        camera.apply(e, "blocks")
-    for i in range(len(x_enemy)):
-        ene = Enemy(x_enemy[i], y_enemy[i])
-        camera.apply(ene, i)
+        # проверка есть ли ключ и столкновение с дверью
+        a.IfNextLevel()
 
-    # проверка есть ли ключ и столкновение с дверью
-    a.IfNextLevel()
+        clock.tick(60)
+        pygame.display.set_caption(f"{int(clock.get_fps()), allMap[a.ThisIsMap]}")
+        pygame.display.update()
 
-    clock.tick(60)
-    pygame.display.set_caption(f"{int(clock.get_fps()), allMap[a.ThisIsMap]}")
-    pygame.display.update()
+
+
+surface = pygame.display.set_mode((1400, 800))
+
+def set_difficulty(value, difficulty):
+    # Do the job here !
+    pass
+
+def start_the_game():
+    GAME()
+
+menu = pygame_menu.Menu('Welcome', 800, 500,
+                       theme=pygame_menu.themes.THEME_BLUE)
+
+# menu.add.text_input('Name :', default='John Doe')
+# menu.add.selector('Difficulty :', [('Hard', 1), ('Easy', 2)], onchange=set_difficulty)
+menu.add.button('Play', start_the_game)
+menu.add.button('Quit', pygame_menu.events.EXIT)
+menu.mainloop(surface)

@@ -16,7 +16,7 @@ class Platform(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self)
         # self.image = pg.Surface((PLATFORM_WIDTH, PLATFORM_HEIGHT))
         self.image = pg.image.load("../IMAGE_GAME/IMAGE_MAP/set.png")
-        self.image = pygame.transform.scale(self.image, (50, 50))
+        self.image = pygame.transform.scale(self.image, (PLATFORM_HEIGHT, PLATFORM_WIDTH))
         # self.image.fill(pg.Color(PLATFORM_COLOR))
         self.rect = pg.Rect(x, y, PLATFORM_WIDTH, PLATFORM_HEIGHT - 5)
 
@@ -69,6 +69,6 @@ class Down_Platform(pg.sprite.Sprite):
     def __init__(self, x, y):
         pg.sprite.Sprite.__init__(self)
         self.image = pg.image.load("../IMAGE_GAME/IMAGE_MAP/set.png")
-        self.image = self.image
+        self.image = pygame.transform.scale(self.image, (PLATFORM_HEIGHT, PLATFORM_WIDTH))
         # self.image.fill(pg.Color(PLATFORM_COLOR))
         self.rect = pg.Rect(x, y, PLATFORM_WIDTH, 1)
