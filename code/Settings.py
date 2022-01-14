@@ -5,7 +5,7 @@ import pygame
 # pygame.mixer.music.play()
 t = 0
 wight = 1400
-height = 800
+height = 700
 size = (wight, height)
 screen = pygame.display.set_mode(size)
 # bg = pygame.image.load('../IMAGE_GAME/IMAGE_MAP/MAP1.png').convert()
@@ -17,8 +17,11 @@ PLATFORM_WIDTH = 40
 PLATFORM_HEIGHT = 40
 PLATFORM_COLOR = "#FF6262"
 
-allMap = ["testMap.txt", "SecondMap.txt", "BossMap.txt"]
-HaveKey = True
+
+GameOn = False
+
+allMap = ["FirstMap.txt", "SecondMap.txt", "BossMap.txt"]
+HaveKey = False
 level = open(f"../MAPS/{allMap[0]}", mode='r', encoding="utf-8").readlines()
 
 aa = 400

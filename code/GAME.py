@@ -1,11 +1,11 @@
 import sys
 from block import *
 from Settings import *
-from Player import Player
+from Mobs import *
+from Death import death_menu
 from Door import *
 import pygame as pg
 import pygame
-import pygame_menu
 import copy
 
 pygame.init()
@@ -15,32 +15,14 @@ class Game:
     def __init__(self, size, screen):
         self.size = size
         self.screen = screen
-        self.x_hero = self.wall_x = 400
-        self.y_hero = self.wall_y = 250
-        self.speed_left = 5
-        self.speed_right = 5
-        self.image_hero_list = [
-            pygame.image.load('../IMAGE_GAME/IMAGE_HERO_D/anonimus1.png'),
-            pygame.image.load('../IMAGE_GAME/IMAGE_HERO_D/anonimus2.png')]
-        self.image_hero_list[0] = pygame.transform.scale(self.image_hero_list[0], (40, 50))
-        self.image_hero_list[1] = pygame.transform.scale(self.image_hero_list[1], (40, 50))
-
-        self.count = 0
-        self.yvel = 0  # скорость вертикального перемещения
-        self.onGround = False  # определяющая на земле мы или нет
-        self.gravity(True)
-        self.jump_time = 0
-        self.stop_jump = True
-        self.right = False
-        self.left = False
-        self.Hitpoints = 40
         self.push_range = 0
         self.push_true = False
         self.push_nap = "None"
         self.plats()
         self.ThisIsMap = 0
+        self.HaveKey = False
+        self.deding = True
 
-        #
     def plats(self):
         self.entities = pygame.sprite.Group()  # Все объекты-платформы
         self.Left_plat = pygame.sprite.Group()
@@ -48,47 +30,7 @@ class Game:
         self.Up_plat = pygame.sprite.Group()
         self.PP_plat = pygame.sprite.Group()
         self.ThisDoor = pygame.sprite.Group()
-
-    def move(self, keys):
-        if keys[pygame.K_ESCAPE]:
-            sys.exit()
-        if keys[pygame.K_SPACE]:
-            if self.onGround:
-                self.stop_jump = False
-        if keys[pygame.K_d]:
-            self.x_hero += self.speed_left
-        elif keys[pygame.K_a]:
-            self.x_hero -= self.speed_right
-
-    def render(self):
-        if self.count >= 8:
-            self.count = 0
-        self.image_hero = self.image_hero_list[self.count // 4]
-        self.count += 1
-
-    def gravity(self, lol):
-        GRAVITY = 0.35  # ускорение свободного падения
-        if self.onGround == False and lol == True:
-            self.yvel += GRAVITY
-            self.y_hero += self.yvel
-
-    def update(self, platforms, left, right, up, pp):
-        self.rect = pygame.Rect(700, self.y_hero, 40, 50)
-        if pygame.sprite.spritecollideany(self, platforms):
-            self.onGround = True
-            self.yvel = 0
-        if pygame.sprite.spritecollideany(self, left):
-            self.x_hero -= 5
-        if pygame.sprite.spritecollideany(self, right):
-            self.x_hero += 5
-        if pygame.sprite.spritecollideany(self, up):
-            self.y_hero += 10
-            # self.yvel = 0
-        if not pygame.sprite.spritecollideany(self, platforms):
-            # если есть пересечени с платформой останавливаем падение
-            self.onGround = False
-        if pygame.sprite.spritecollideany(self, pp):
-            self.y_hero -= 1
+        self.Key = pygame.sprite.Group()
 
     def jump(self, stop):
         if stop == True and self.stop_jump == False:
@@ -99,29 +41,38 @@ class Game:
                 self.stop_jump = True
 
     def copy(self):
-        self.xx_hero = copy.copy(self.x_hero)
-        self.yy_hero = copy.copy(self.y_hero)
+        player.xx_hero = copy.copy(player.x_hero)
+        player.yy_hero = copy.copy(player.y_hero)
 
     def IfNextLevel(self):
-        self.rect = pygame.Rect(700, self.y_hero, 40, 50)
-        if HaveKey == True:
-            if pygame.sprite.spritecollideany(self, a.ThisDoor):
+        self.rect = pygame.Rect(700, player.y_hero, 40, 50)
+        if a.HaveKey == True:
+            if pygame.sprite.spritecollideany(self, self.ThisDoor):
                 self.plats()
                 self.ThisIsMap += 1
                 level = open(f"../MAPS/{allMap[self.ThisIsMap]}", mode='r', encoding="utf-8").readlines()
                 mapping(level)
 
+    def Death(self):
+        global run, go_game
+        if player.Hitpoints == 1:
+            run = False
+            go_game = False
+            death_menu()
+
+    def Keyying(self):
+        self.rect = pygame.Rect(700, player.y_hero, 40, 50)
+        if pygame.sprite.spritecollideany(self, self.Key):
+            self.HaveKey = True
+
+
 
 a = Game(size, screen)
+player = Player()
 x_enemy = []
 y_enemy = []
 
-# entities = pygame.sprite.Group()  # Все объекты-платформы
-# Left_plat = pygame.sprite.Group()
-# Right_plat = pygame.sprite.Group()
-# Up_plat = pygame.sprite.Group()
-# PP_plat = pygame.sprite.Group()
-# ThisDoor = pygame.sprite.Group()
+
 def mapping(level):
     x = y = 0
     for row in level:  # вся строка
@@ -150,6 +101,7 @@ def mapping(level):
                 a.ThisDoor.add(nextLevel)
             elif col == "K":
                 ThisKey = Key(x, y)
+                a.Key.add(ThisKey)
             x += PLATFORM_WIDTH
         y += PLATFORM_HEIGHT
         x = 0
@@ -197,7 +149,7 @@ class Enemy(pg.sprite.Sprite):
             x_enemy[self.typ] -= self.speed_enemy
 
     def visor(self):
-        self.rect = pygame.Rect(700, a.y_hero, 40, 50)
+        self.rect = pygame.Rect(700, player.y_hero, 40, 50)
         R = pygame.sprite.Group()
         L = pygame.sprite.Group()
         left_visor = Attack(x_enemy[self.typ] - 120, y_enemy[self.typ], 120, 3)
@@ -213,13 +165,13 @@ class Enemy(pg.sprite.Sprite):
         # print(self.direction)
 
     def attack(self, visa):
-        self.rect = pygame.Rect(700, a.y_hero, 40, 50)
+        self.rect = pygame.Rect(700, player.y_hero, 40, 50)
         if visa == "Right":
             rect_Player = Attack(x_enemy[self.typ] + 30, y_enemy[self.typ], 30, 30)
             DD = pygame.sprite.Group()
             DD.add(rect_Player)
             if pygame.sprite.spritecollideany(self, DD):
-                a.Hitpoints -= 10
+                player.Hitpoints -= 10
                 a.push_true = True
                 a.push_nap = "Right"
         elif visa == "Left":
@@ -227,7 +179,7 @@ class Enemy(pg.sprite.Sprite):
             DD = pygame.sprite.Group()
             DD.add(rect_Player)
             if pygame.sprite.spritecollideany(self, DD):
-                a.Hitpoints -= 10
+                player.Hitpoints -= 10
                 a.push_true = True
                 a.push_nap = "Left"
 
@@ -247,27 +199,11 @@ class Enemy(pg.sprite.Sprite):
         if self.onGround == False:
             y_enemy[self.typ] += self.yvel
 
-    # def walls(self, i, platforms, left, right, up, pp):
-    #     self.rect = pygame.Rect(aa, bb, 40, 50)
-    #     if pygame.sprite.spritecollideany(self, platforms):
-    #         self.onGround = True
-    #     if pygame.sprite.spritecollideany(self, left):
-    #         x_enemy[i] -= 5
-    #     if pygame.sprite.spritecollideany(self, right):
-    #         x_enemy[i] += 5
-    #     # if pygame.sprite.spritecollideany(self, up):
-    #     #     self.onGround = True
-    #     #     self.yvel = 0
-    #     if not pygame.sprite.spritecollideany(self, platforms):
-    #         # если есть пересечени с платформой останавливаем падение
-    #         self.onGround = False
-    #     if pygame.sprite.spritecollideany(self, pp):
-    #         y_enemy[i] -= 2
 
     def push_left(self):
         if a.push_range <= 10 and a.push_true == True and a.push_nap == "Left":
             a.push_range += 1
-            a.x_hero -= 10
+            player.x_hero -= 10
             if a.push_range == 10:
                 a.push_range = 0
                 a.push_true = False
@@ -276,7 +212,7 @@ class Enemy(pg.sprite.Sprite):
     def push_right(self):
         if a.push_range <= 10 and a.push_true == True and a.push_nap == "Right":
             a.push_range += 1
-            a.x_hero += 10
+            player.x_hero += 10
             if a.push_range == 10:
                 a.push_range = 0
                 a.push_true = False
@@ -315,58 +251,59 @@ class Camera:
             # y_enemy[what] -= self.dy
     # позиционировать камеру на объекте target
     def update(self):
-        self.dx = (a.x_hero - a.xx_hero)
-        self.dy = (a.y_hero - a.yy_hero)
+        self.dx = (player.x_hero - player.xx_hero)
+        self.dy = (player.y_hero - player.yy_hero)
 
 
 
 camera = Camera()
 all_sprites = pg.sprite.Group()
 def GAME():
-    while 1:
+    global run
+    while run:
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     sys.exit()
             elif event.type == pygame.QUIT:
                 sys.exit()
-        a.render()
+        # death
+        a.Death()
+        player.render()
         a.copy()
         screen.blit(bg, (0, 0))
         keys = pygame.key.get_pressed()
         if 1 in keys:
-            a.move(keys)
+            player.move(keys)
         all_sprites = pg.sprite.Group()
         # здесь передаем значение методу гравити и джамп для постоянной проверки на каждой итерации
-        a.gravity(True)
-        a.jump(True)
+        player.gravity(True)
+        player.jump(True)
         # вывод на экран героя
-        # screen.blit(a.image_hero, (a.x_hero, a.y_hero))
-        screen.blit(a.image_hero, (700, a.y_hero))
+        screen.blit(player.image_hero, (700, player.y_hero))
         # обновление врагов и их вывод
         for i in range(len(x_enemy)):
             ene = Enemy(x_enemy[i], y_enemy[i])
-            # ene.walls(i, a.entities, a.Left_plat, a.Right_plat, a.Up_plat, a.PP_plat)
             ene.update(i, a.entities, a.Left_plat, a.Right_plat, a.Up_plat, a.PP_plat)
             screen.blit(ene.image, (ene.x_e, ene.y_e))
-            # добавление врагов в общую группу спрайтов
-            # all_sprites.add(ene)
-
         # создание спрайта ирока для работы с камерой
-        player = Player(a.x_hero, a.y_hero)
         # обновление платформ и их вывод
+        player.update(a.entities, a.Left_plat, a.Right_plat, a.Up_plat, a.PP_plat, a.Key)
+        a.Keyying()
         a.entities.draw(screen)
-        a.update(a.entities, a.Left_plat, a.Right_plat, a.Up_plat, a.PP_plat)
         a.ThisDoor.draw(screen)
         a.Up_plat.draw(screen)
+        if a.HaveKey == False:
+            a.Key.draw(screen)
         # добавление всех спратов в общую группу
-        all_sprites.add(player)
+        # all_sprites.add(player)
         all_sprites.add(a.entities)
         all_sprites.add(a.Left_plat)
         all_sprites.add(a.Right_plat)
         all_sprites.add(a.Up_plat)
         all_sprites.add(a.PP_plat)
         all_sprites.add(a.ThisDoor)
+        all_sprites.add(a.Key)
         camera.update()  # центризируем камеру относительно персонажа
         for e in all_sprites:
             camera.apply(e, "blocks")
@@ -378,25 +315,68 @@ def GAME():
         a.IfNextLevel()
 
         clock.tick(60)
-        pygame.display.set_caption(f"{int(clock.get_fps()), allMap[a.ThisIsMap]}")
+        pygame.display.set_caption(
+            f"{int(clock.get_fps()), allMap[a.ThisIsMap], player.Hitpoints, player.x_hero, player.y_hero}")
+        pygame.display.update()
+
+
+def start_the_game():
+    # GAME()
+    # print(1)
+    start_menu_bg = pygame.image.load("../IMAGE_GAME/IMAGE_MAP/Bg_start.jpg")
+
+    start_btn = pygame.draw.rect(screen, (255, 255, 255),
+                 (20, 20, 100, 75))
+
+    sc = pygame.display.set_mode((1400, 800))
+    sc.blit(start_menu_bg, (0, 0))
+
+    font = pygame.font.SysFont("Times New Roman", 20)
+    font1 = pygame.font.SysFont("Times New Roman", 25)
+
+    text_start = font.render("Начать", True, (0, 0, 0))
+    text_exit = font.render("Выйти", True, (0, 0, 0))
+    how_exit = font1.render("Чтобы выйти в любой момент игры, вы можете нажать Esc", True, (0, 0, 0))
+
+    Rect_start = pygame.Rect((585, 502, 200, 40))
+    Rect_exit = pygame.Rect((585, 552, 200, 40))
+
+    # здесь будут рисоваться фигуры
+
+
+    while 1:
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    sys.exit()
+            if event.type == pg.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    if Rect_start.collidepoint(event.pos):
+                        GAME()
+                    if Rect_exit.collidepoint(event.pos):
+                        sys.exit()
+
+        # кнопка начала игры
+        start_rgb = (185, 238, 238)
+        pygame.draw.rect(sc, (start_rgb),
+                         (585, 502, 200, 40))
+        sc.blit(text_start, (655, 512))
+
+        # кнопка выхода
+        exit_rgb = (250, 218, 221)
+        pygame.draw.rect(sc, (exit_rgb),
+                         (585, 552, 200, 40))
+        sc.blit(text_exit, (655, 562))
+
+        sc.blit(how_exit, (30, 740))
+
         pygame.display.update()
 
 
 
-surface = pygame.display.set_mode((1400, 800))
-
-def set_difficulty(value, difficulty):
-    # Do the job here !
-    pass
-
-def start_the_game():
-    GAME()
-
-menu = pygame_menu.Menu('Welcome', 800, 500,
-                       theme=pygame_menu.themes.THEME_BLUE)
-
-# menu.add.text_input('Name :', default='John Doe')
-# menu.add.selector('Difficulty :', [('Hard', 1), ('Easy', 2)], onchange=set_difficulty)
-menu.add.button('Play', start_the_game)
-menu.add.button('Quit', pygame_menu.events.EXIT)
-menu.mainloop(surface)
+go_game = True
+while go_game:
+    start_the_game()
+    # death_menu()
