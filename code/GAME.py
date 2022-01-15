@@ -50,7 +50,7 @@ class Game:
 
     def Death(self):
         global run, go_game
-        if player.Hitpoints == 1:
+        if player.Hitpoints <= 0:
             run = False
             go_game = False
             death_menu()
@@ -98,15 +98,16 @@ def mapping(level):
 
 
 class Attack(pg.sprite.Sprite):
-    def __init__(self, x, y, v, z):
+    def __init__(self, x, y, v, z, draf=True):
         pg.sprite.Sprite.__init__(self)
         self.image = pg.Surface((v, 10))
         self.image = pg.image.load("../IMAGE_GAME/IMAGE_HERO_D/Non.png")
         self.image = self.image
         # self.image.fill(pg.Color(PLATFORM_COLOR))
         self.rect = pg.Rect(x, y + 10, v, z)
-        pygame.draw.rect(screen, (255, 255, 255),
-                         (x, y + 10, v, z))
+        if draf:
+            pygame.draw.rect(screen, (255, 255, 255),
+                            (x, y + 10, v, z))
 
 
 
@@ -135,8 +136,8 @@ class Enemy(pg.sprite.Sprite):
         self.rect = pygame.Rect(700, player.y_hero, 30, 50)
         R = pygame.sprite.Group()
         L = pygame.sprite.Group()
-        left_visor = Attack(x_enemy[self.typ] - 120, y_enemy[self.typ], 120, 3)
-        right_visor = Attack(x_enemy[self.typ] + 40, y_enemy[self.typ], 120, 3)
+        left_visor = Attack(x_enemy[self.typ] - 120, y_enemy[self.typ], 120, 3, False)
+        right_visor = Attack(x_enemy[self.typ] + 40, y_enemy[self.typ], 120, 3, False)
         R.add(right_visor)
         L.add(left_visor)
         if pygame.sprite.spritecollideany(self, R):
@@ -241,6 +242,7 @@ class Camera:
 
 def GAME():
     global run
+    pg.mouse.set_visible(False)
     while run:
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:

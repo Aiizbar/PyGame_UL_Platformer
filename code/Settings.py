@@ -7,7 +7,7 @@ pygame.mixer.init()
 my_sound = pygame.mixer.Sound('../SOUNDS/Unicorn.mp3')
 my_sound.play()
 
-my_sound.set_volume(10)
+my_sound.set_volume(1)
 
 t = 0
 wight = 1400

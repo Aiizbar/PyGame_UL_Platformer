@@ -4,6 +4,8 @@ import sys
 from Settings import *
 
 def death_menu():
+    pg.mouse.set_visible(True)
+
     start_menu_bg = pygame.image.load("../IMAGE_GAME/IMAGE_MAP/Bg_end.jpg")
 
     sc = pygame.display.set_mode((1400, 800))
