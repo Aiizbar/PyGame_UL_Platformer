@@ -273,7 +273,7 @@ def GAME():
         a.Keyying()
         a.entities.draw(screen)
         a.ThisDoor.draw(screen)
-        a.Up_plat.draw(screen)
+        # a.Up_plat.draw(screen)
         if a.HaveKey == False:
             a.Key.draw(screen)
         # добавление всех спратов в общую группу

@@ -11,12 +11,12 @@ my_sound.set_volume(10)
 
 t = 0
 wight = 1400
-height = 700
+height = 800
 size = (wight, height)
 screen = pygame.display.set_mode(size)
 # bg = pygame.image.load('../IMAGE_GAME/IMAGE_MAP/MAP1.png').convert()
-bg = pygame.image.load('../IMAGE_GAME/IMAGE_MAP/stena1.jpg').convert()
-bg = pygame.transform.scale(bg, (2500, 2000))
+bg = pygame.image.load('../IMAGE_GAME/IMAGE_MAP/Wood.png').convert()
+bg = pygame.transform.scale(bg, (1400, 800))
 clock = pygame.time.Clock()
 run = True
 PLATFORM_WIDTH = 40
