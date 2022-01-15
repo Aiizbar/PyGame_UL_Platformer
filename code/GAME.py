@@ -215,9 +215,6 @@ class Enemy(pg.sprite.Sprite):
         self.movi_enemy(self.direction)
 
 
-for i in range(len(x_enemy)):
-    opponent = Enemy(x_enemy[i], y_enemy[i])
-
 
 class Camera:
     # зададим начальный сдвиг камеры
