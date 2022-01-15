@@ -1,8 +1,14 @@
 import pygame
 
-
-# pygame.mixer.music.load('../SOUNDS/sound_bg1.ogg')
+pygame.mixer.init()
+# pygame.mixer.music.load('../SOUNDS/Alizbar - Dance of Unicorns.mp3')
 # pygame.mixer.music.play()
+
+my_sound = pygame.mixer.Sound('../SOUNDS/Unicorn.mp3')
+my_sound.play()
+
+my_sound.set_volume(10)
+
 t = 0
 wight = 1400
 height = 700
@@ -17,6 +23,10 @@ PLATFORM_WIDTH = 40
 PLATFORM_HEIGHT = 40
 PLATFORM_COLOR = "#FF6262"
 
+ENEMY_WIDTH = 40
+ENEMY_HEIGHT = 50
+x_enemy = []
+y_enemy = []
 
 GameOn = False
 

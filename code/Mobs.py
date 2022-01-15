@@ -8,18 +8,42 @@ import sys
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.image.load('../IMAGE_GAME/IMAGE_HERO_D/anonimus1.png')
+        self.image = pygame.image.load('../IMAGE_GAME/IMAGE_HERO_D/GG/ggStay.png')
         self.rect = pygame.Rect(400, 250, 40, 50)
+        self.image_hero = pygame.image.load('../IMAGE_GAME/IMAGE_HERO_D/GG/ggStay.png')
+        self.image_hero = pygame.transform.scale(self.image_hero, (30, 50))
 
         self.x_hero = self.wall_x = 400
         self.y_hero = self.wall_y = 250
         self.speed_left = 5
         self.speed_right = 5
-        self.image_hero_list = [
-            pygame.image.load('../IMAGE_GAME/IMAGE_HERO_D/anonimus1.png'),
-            pygame.image.load('../IMAGE_GAME/IMAGE_HERO_D/anonimus2.png')]
-        self.image_hero_list[0] = pygame.transform.scale(self.image_hero_list[0], (40, 50))
-        self.image_hero_list[1] = pygame.transform.scale(self.image_hero_list[1], (40, 50))
+        # self.image_hero_list = [
+        #     pygame.image.load('../IMAGE_GAME/IMAGE_HERO_D/GG/ggStep1.png'),
+        #     pygame.image.load('../IMAGE_GAME/IMAGE_HERO_D/GG/ggStep2.png')]
+        # self.image_hero_list[0] = pygame.transform.scale(self.image_hero_list[0], (30, 50))
+        # self.image_hero_list[1] = pygame.transform.scale(self.image_hero_list[1], (30, 50))
+
+        self.image_hero_list_right = [
+            pygame.image.load('../IMAGE_GAME/IMAGE_HERO_D/GG/ggStep1.png'),
+            pygame.image.load('../IMAGE_GAME/IMAGE_HERO_D/GG/ggStep2.png'),
+            pygame.image.load('../IMAGE_GAME/IMAGE_HERO_D/GG/ggStep3.png'),
+            pygame.image.load('../IMAGE_GAME/IMAGE_HERO_D/GG/ggStep4.png'),
+            pygame.image.load('../IMAGE_GAME/IMAGE_HERO_D/GG/ggStep5.png'),
+            pygame.image.load('../IMAGE_GAME/IMAGE_HERO_D/GG/ggStep6.png'),
+            pygame.image.load('../IMAGE_GAME/IMAGE_HERO_D/GG/ggStep7.png')]
+        for i in range(len(self.image_hero_list_right)):
+            self.image_hero_list_right[i] = pygame.transform.scale(self.image_hero_list_right[i], (30, 50))
+
+        self.image_hero_list_left = [
+            pygame.image.load('../IMAGE_GAME/IMAGE_HERO_D/GGLeft/ggStep1.png'),
+            pygame.image.load('../IMAGE_GAME/IMAGE_HERO_D/GGLeft/ggStep2.png'),
+            pygame.image.load('../IMAGE_GAME/IMAGE_HERO_D/GGLeft/ggStep3.png'),
+            pygame.image.load('../IMAGE_GAME/IMAGE_HERO_D/GGLeft/ggStep4.png'),
+            pygame.image.load('../IMAGE_GAME/IMAGE_HERO_D/GGLeft/ggStep5.png'),
+            pygame.image.load('../IMAGE_GAME/IMAGE_HERO_D/GGLeft/ggStep6.png'),
+            pygame.image.load('../IMAGE_GAME/IMAGE_HERO_D/GGLeft/ggStep7.png')]
+        for i in range(len(self.image_hero_list_right)):
+            self.image_hero_list_left[i] = pygame.transform.scale(self.image_hero_list_left[i], (30, 50))
 
         self.count = 0
         self.yvel = 0  # скорость вертикального перемещения
@@ -31,6 +55,9 @@ class Player(pygame.sprite.Sprite):
         self.left = False
         self.Hitpoints = 40
 
+        self.animation_range_right = 0
+        self.animation_range_left = 0
+
     def move(self, keys):
         if keys[pygame.K_ESCAPE]:
             sys.exit()
@@ -38,15 +65,30 @@ class Player(pygame.sprite.Sprite):
             if self.onGround:
                 self.stop_jump = False
         if keys[pygame.K_d]:
-            self.x_hero += self.speed_left
+            self.x_hero += self.speed_right
+            self.animation_right()
         elif keys[pygame.K_a]:
             self.x_hero -= self.speed_right
+            self.animation_left()
 
-    def render(self):
-        if self.count >= 8:
-            self.count = 0
-        self.image_hero = self.image_hero_list[self.count // 4]
-        self.count += 1
+    def animation_right(self):
+        if self.animation_range_right >= 14:
+            self.animation_range_right = 0
+        self.image_hero = self.image_hero_list_right[self.animation_range_right // 2]
+        self.animation_range_right += 1
+
+    def animation_left(self):
+        if self.animation_range_left >= 14:
+            self.animation_range_left = 0
+        self.image_hero = self.image_hero_list_left[self.animation_range_left // 2]
+        self.animation_range_left += 1
+
+
+    # def render(self):
+    #     if self.count >= 8:
+    #         self.count = 0
+    #     self.image_hero = self.image_hero_list[self.count // 4]
+    #     self.count += 1
 
     def gravity(self, lol):
         GRAVITY = 0.35  # ускорение свободного падения
@@ -64,7 +106,7 @@ class Player(pygame.sprite.Sprite):
         if pygame.sprite.spritecollideany(self, right):
             self.x_hero += 5
         if pygame.sprite.spritecollideany(self, up):
-            self.y_hero += 10
+            self.y_hero += 20
             # self.yvel = 0
         if not pygame.sprite.spritecollideany(self, platforms):
             # если есть пересечени с платформой останавливаем падение

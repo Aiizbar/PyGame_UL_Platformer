@@ -63,7 +63,7 @@ class Up_Platform(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self)
         self.image = pg.image.load("../IMAGE_GAME/IMAGE_MAP/set.png")
         self.image = self.image
-        self.rect = pg.Rect(x + 7 * 2, y + 2 * 2, PLATFORM_WIDTH - 7, 5)
+        self.rect = pg.Rect(x, y , PLATFORM_WIDTH, PLATFORM_HEIGHT)
 
 class Down_Platform(pg.sprite.Sprite):
     def __init__(self, x, y):

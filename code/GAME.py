@@ -24,6 +24,9 @@ class Game:
         self.deding = True
 
     def plats(self):
+        global x_enemy, y_enemy
+        x_enemy = []
+        y_enemy = []
         self.entities = pygame.sprite.Group()  # Все объекты-платформы
         self.Left_plat = pygame.sprite.Group()
         self.Right_plat = pygame.sprite.Group()
@@ -32,20 +35,12 @@ class Game:
         self.ThisDoor = pygame.sprite.Group()
         self.Key = pygame.sprite.Group()
 
-    def jump(self, stop):
-        if stop == True and self.stop_jump == False:
-            self.y_hero -= 10
-            self.jump_time += 1
-            if self.jump_time == 15:
-                self.jump_time = 0
-                self.stop_jump = True
-
     def copy(self):
         player.xx_hero = copy.copy(player.x_hero)
         player.yy_hero = copy.copy(player.y_hero)
 
     def IfNextLevel(self):
-        self.rect = pygame.Rect(700, player.y_hero, 40, 50)
+        self.rect = pygame.Rect(700, player.y_hero, 30, 50)
         if a.HaveKey == True:
             if pygame.sprite.spritecollideany(self, self.ThisDoor):
                 self.plats()
@@ -61,16 +56,10 @@ class Game:
             death_menu()
 
     def Keyying(self):
-        self.rect = pygame.Rect(700, player.y_hero, 40, 50)
+        self.rect = pygame.Rect(700, player.y_hero, 30, 50)
         if pygame.sprite.spritecollideany(self, self.Key):
             self.HaveKey = True
 
-
-
-a = Game(size, screen)
-player = Player()
-x_enemy = []
-y_enemy = []
 
 
 def mapping(level):
@@ -105,10 +94,7 @@ def mapping(level):
             x += PLATFORM_WIDTH
         y += PLATFORM_HEIGHT
         x = 0
-    # for i in range(len(x_enemy)):
-    #     opponent = Enemy(x_enemy[i], y_enemy[i])
 
-mapping(level)
 
 
 class Attack(pg.sprite.Sprite):
@@ -123,9 +109,6 @@ class Attack(pg.sprite.Sprite):
                          (x, y + 10, v, z))
 
 
-ENEMY_WIDTH = 40
-ENEMY_HEIGHT = 50
-
 
 class Enemy(pg.sprite.Sprite):
     def __init__(self, x, y):
@@ -137,8 +120,8 @@ class Enemy(pg.sprite.Sprite):
         # создание спрайтов для отображения
         self.rect = pg.Rect(self.x_e, self.y_e, ENEMY_WIDTH, ENEMY_HEIGHT)
         # self.image = pg.Surface((ENEMY_WIDTH, ENEMY_HEIGHT))
-        self.image = pg.image.load("../IMAGE_GAME/IMAGE_HERO_D/DogStop.png")
-        self.image = pg.transform.scale(self.image, (40, 50))
+        self.image = pg.image.load("../IMAGE_GAME/IMAGE_HERO_D/Inoske.jpg")
+        self.image = pg.transform.scale(self.image, (60, 60))
         self.yvel = 5
 
     def movi_enemy(self, where):
@@ -149,7 +132,7 @@ class Enemy(pg.sprite.Sprite):
             x_enemy[self.typ] -= self.speed_enemy
 
     def visor(self):
-        self.rect = pygame.Rect(700, player.y_hero, 40, 50)
+        self.rect = pygame.Rect(700, player.y_hero, 30, 50)
         R = pygame.sprite.Group()
         L = pygame.sprite.Group()
         left_visor = Attack(x_enemy[self.typ] - 120, y_enemy[self.typ], 120, 3)
@@ -165,9 +148,9 @@ class Enemy(pg.sprite.Sprite):
         # print(self.direction)
 
     def attack(self, visa):
-        self.rect = pygame.Rect(700, player.y_hero, 40, 50)
+        self.rect = pygame.Rect(700, player.y_hero, 30, 50)
         if visa == "Right":
-            rect_Player = Attack(x_enemy[self.typ] + 30, y_enemy[self.typ], 30, 30)
+            rect_Player = Attack(x_enemy[self.typ] + 60, y_enemy[self.typ], 30, 30)
             DD = pygame.sprite.Group()
             DD.add(rect_Player)
             if pygame.sprite.spritecollideany(self, DD):
@@ -184,7 +167,7 @@ class Enemy(pg.sprite.Sprite):
                 a.push_nap = "Left"
 
     def walls(self, e, pp):
-        self.rect = pygame.Rect(x_enemy[self.typ], y_enemy[self.typ], 40, 50)
+        self.rect = pygame.Rect(x_enemy[self.typ], y_enemy[self.typ], 60, 60)
         if not pygame.sprite.spritecollideany(self, e):
             # если нет столкновения с платформой - падаем вниз
             self.onGround = False
@@ -256,8 +239,6 @@ class Camera:
 
 
 
-camera = Camera()
-all_sprites = pg.sprite.Group()
 def GAME():
     global run
     while run:
@@ -269,7 +250,7 @@ def GAME():
                 sys.exit()
         # death
         a.Death()
-        player.render()
+        # player.render()
         a.copy()
         screen.blit(bg, (0, 0))
         keys = pygame.key.get_pressed()
@@ -316,7 +297,7 @@ def GAME():
 
         clock.tick(60)
         pygame.display.set_caption(
-            f"{int(clock.get_fps()), allMap[a.ThisIsMap], player.Hitpoints, player.x_hero, player.y_hero}")
+            f"{int(clock.get_fps()), player.animation_range_right}")
         pygame.display.update()
 
 
@@ -374,9 +355,12 @@ def start_the_game():
 
         pygame.display.update()
 
-
+a = Game(size, screen)
+player = Player()
+mapping(level)
+camera = Camera()
+all_sprites = pg.sprite.Group()
 
 go_game = True
 while go_game:
     start_the_game()
-    # death_menu()
