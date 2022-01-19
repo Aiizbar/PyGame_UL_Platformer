@@ -1,8 +1,8 @@
 import pygame as pg
 pg.init()
 
-doorW = 100 // 2
-doorH = 200 // 2
+doorW = 40
+doorH = 80
 
 class Door(pg.sprite.Sprite):
     def __init__(self, x, y):
@@ -20,4 +20,4 @@ class Key(pg.sprite.Sprite):
         self.image = pg.image.load("../IMAGE_GAME/IMAGE_MAP/KEY.png")
         self.image = pg.transform.scale(self.image, (15, 15))
         # self.image.fill(pg.Color(PLATFORM_COLOR))
-        self.rect = pg.Rect(x, y, doorW, doorH)
+        self.rect = pg.Rect(x, y, 15, 15)

@@ -27,6 +27,10 @@ ENEMY_WIDTH = 40
 ENEMY_HEIGHT = 50
 x_enemy = []
 y_enemy = []
+x_bora = []
+y_bora = []
+ifBoss = False
+
 
 GameOn = False
 
@@ -36,3 +40,5 @@ level = open(f"../MAPS/{allMap[0]}", mode='r', encoding="utf-8").readlines()
 
 aa = 400
 bb = 250
+
+IfWin = False

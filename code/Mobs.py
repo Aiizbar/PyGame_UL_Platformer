@@ -53,7 +53,7 @@ class Player(pygame.sprite.Sprite):
         self.stop_jump = True
         self.right = False
         self.left = False
-        self.Hitpoints = 40
+        self.Hitpoints = 140
 
         self.animation_range_right = 0
         self.animation_range_left = 0
@@ -83,13 +83,6 @@ class Player(pygame.sprite.Sprite):
         self.image_hero = self.image_hero_list_left[self.animation_range_left // 2]
         self.animation_range_left += 1
 
-
-    # def render(self):
-    #     if self.count >= 8:
-    #         self.count = 0
-    #     self.image_hero = self.image_hero_list[self.count // 4]
-    #     self.count += 1
-
     def gravity(self, lol):
         GRAVITY = 0.35  # ускорение свободного падения
         if self.onGround == False and lol == True:
@@ -107,7 +100,6 @@ class Player(pygame.sprite.Sprite):
             self.x_hero += 5
         if pygame.sprite.spritecollideany(self, up):
             self.y_hero += 20
-            # self.yvel = 0
         if not pygame.sprite.spritecollideany(self, platforms):
             # если есть пересечени с платформой останавливаем падение
             self.onGround = False
@@ -121,5 +113,82 @@ class Player(pygame.sprite.Sprite):
             if self.jump_time == 15:
                 self.jump_time = 0
                 self.stop_jump = True
+
+
+class Attack_Boss(pg.sprite.Sprite):
+    def __init__(self, x, y, v, z):
+        pg.sprite.Sprite.__init__(self)
+        self.image = pg.Surface((v, 10))
+        self.image = pg.image.load("../IMAGE_GAME/IMAGE_HERO_D/Non.png")
+        self.image = self.image
+        self.rect = pg.Rect(x, y, v, z)
+        pygame.draw.rect(screen, (255, 255, 255), (x, y, v, z))
+
+
+BOSS_W = 250
+BOSS_H = 150
+player = Player()
+
+
+class Borov(pg.sprite.Sprite):
+    def __init__(self, x, y):
+        pg.sprite.Sprite.__init__(self)
+        self.x_boss = x
+        self.y_boss = y
+
+        self.speed_step = 2
+        self.speed_push = 7
+
+        self.rect = pg.Rect(self.x_boss, self.y_boss, BOSS_W, BOSS_H)
+        self.image_b = pg.image.load("../IMAGE_GAME/IMAGE_HERO_D/Inoske.jpg")
+        self.image_b = pg.transform.scale(self.image_b, (BOSS_W, BOSS_H))
+
+        self.vizor = False
+
+    def movi(self):
+        pass
+
+    def scanning(self):
+        self.rect = pygame.Rect(700, player.y_hero, 30, 50)
+        left_visor = Attack_Boss(self.x_boss - 800, self.y_boss + 120, 800, 20)
+        right_visor = Attack_Boss(self.x_boss + 250, self.y_boss + 120, 800, 20)
+        r = pygame.sprite.Group()
+        r.add(right_visor)
+        l = pygame.sprite.Group()
+        l.add(left_visor)
+        if pygame.sprite.spritecollideany(self, r):
+            self.vizor = "Right"
+        elif pygame.sprite.spritecollideany(self, l):
+            self.vizor = "Left"
+        else:
+            self.vizor = "None"
+
+    def attaks(self, gogogoGOOOOOOOOOOO):
+        global x_bora
+        if gogogoGOOOOOOOOOOO == "Right":
+            x_bora += 10
+            self.push()
+        if gogogoGOOOOOOOOOOO == "Left":
+            x_bora -= 10
+            self.push()
+
+    def walls(self):
+        pass
+
+    def push(self):
+        global x_bora, y_bora
+        self.rect = pygame.Rect(700, player.y_hero, 30, 50)
+        GOOOOOOOOOOOOOOOD = Attack_Boss(x_bora, y_bora, BOSS_W, BOSS_H)
+        FackingPUUUUUSH = pygame.sprite.Group()
+        FackingPUUUUUSH.add(GOOOOOOOOOOOOOOOD)
+        if pygame.sprite.spritecollideany(self, FackingPUUUUUSH):
+            player.Hitpoints -= 100000
+
+    def update(self):
+        self.scanning()
+        if self.vizor != "None":
+            print("GOGOGOGOGO")
+            self.attaks(self.vizor)
+        self.walls()
 
 

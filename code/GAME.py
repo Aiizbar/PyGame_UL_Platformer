@@ -1,11 +1,22 @@
+import pygame as pg
+import pygame
+
+W = 1400
+H = 800
+sc = pg.display.set_mode((W, H))
+dog_surf = pg.image.load('../IMAGE_GAME/IMAGE_MAP/Loading_img.jpg')
+dog_surf = pg.transform.scale(dog_surf, (1400, 800))
+sc.blit(dog_surf, (0, 0))
+pg.display.update()
+
+
 import sys
 from block import *
 from Settings import *
 from Mobs import *
 from Death import death_menu
 from Door import *
-import pygame as pg
-import pygame
+from Win import Win
 import copy
 
 pygame.init()
@@ -22,6 +33,7 @@ class Game:
         self.ThisIsMap = 0
         self.HaveKey = False
         self.deding = True
+        self.ifBoss = False
 
     def plats(self):
         global x_enemy, y_enemy
@@ -34,6 +46,7 @@ class Game:
         self.PP_plat = pygame.sprite.Group()
         self.ThisDoor = pygame.sprite.Group()
         self.Key = pygame.sprite.Group()
+        self.Boroff = pygame.sprite.Group
 
     def copy(self):
         player.xx_hero = copy.copy(player.x_hero)
@@ -41,12 +54,15 @@ class Game:
 
     def IfNextLevel(self):
         self.rect = pygame.Rect(700, player.y_hero, 30, 50)
-        if a.HaveKey == True:
+        if self.HaveKey == True:
             if pygame.sprite.spritecollideany(self, self.ThisDoor):
                 self.plats()
                 self.ThisIsMap += 1
+                if self.ThisIsMap > 2:
+                    Win(pygame.time.get_ticks() // 1000)
                 level = open(f"../MAPS/{allMap[self.ThisIsMap]}", mode='r', encoding="utf-8").readlines()
                 mapping(level)
+                self.HaveKey = False
 
     def Death(self):
         global run, go_game
@@ -64,6 +80,7 @@ class Game:
 
 def mapping(level):
     x = y = 0
+    global ifBoss, x_bora, y_bora
     for row in level:  # вся строка
         for col in row:  # каждый символ
             if col == "-":  # если платформа
@@ -91,6 +108,11 @@ def mapping(level):
             elif col == "K":
                 ThisKey = Key(x, y)
                 a.Key.add(ThisKey)
+            elif col == "B":
+                ifBoss = True
+                x_bora = x
+                y_bora = y
+                a.ifBoss = True
             x += PLATFORM_WIDTH
         y += PLATFORM_HEIGHT
         x = 0
@@ -224,10 +246,13 @@ class Camera:
 
     # сдвинуть объект obj на смещение камеры
     def apply(self, obj, what):
+        global x_bora
         if what == "blocks":
             obj.rect.x -= self.dx
             # obj.rect.y -= self.dy
-        if what != "blocks":
+        elif what == "Boss":
+            x_bora -= self.dx
+        elif what != "blocks" and what != "Boss":
             x_enemy[what] -= self.dx
             # y_enemy[what] -= self.dy
     # позиционировать камеру на объекте target
@@ -247,9 +272,23 @@ def GAME():
                     sys.exit()
             elif event.type == pygame.QUIT:
                 sys.exit()
+
+        if a.ifBoss:
+            Bora = Borov(x_bora, y_bora)
+
+        font = pygame.font.SysFont("Times New Roman", 20)
+
+        Hits = font.render(f" Hitpoints: {player.Hitpoints}", True, (0, 0, 0))
+
+        if a.HaveKey == True:
+            YourHaveKey = font.render("У вас есть ключ", True, (0, 0, 0))
+        if a.HaveKey == False:
+            YourHaveKey = font.render("У вас нет ключа", True, (0, 0, 0))
+
+        # NowTime = font.render(f" Время в секундах: {pygame.time.get_ticks() // 1000}", True, (0, 0, 0))
+
         # death
         a.Death()
-        # player.render()
         a.copy()
         screen.blit(bg, (0, 0))
         keys = pygame.key.get_pressed()
@@ -275,8 +314,13 @@ def GAME():
         # a.Up_plat.draw(screen)
         if a.HaveKey == False:
             a.Key.draw(screen)
+
+        # работа с Боровом
+        if ifBoss:
+            screen.blit(Bora.image_b, (Bora.x_boss, Bora.y_boss))
+            Bora.update()
+
         # добавление всех спратов в общую группу
-        # all_sprites.add(player)
         all_sprites.add(a.entities)
         all_sprites.add(a.Left_plat)
         all_sprites.add(a.Right_plat)
@@ -284,29 +328,31 @@ def GAME():
         all_sprites.add(a.PP_plat)
         all_sprites.add(a.ThisDoor)
         all_sprites.add(a.Key)
+
         camera.update()  # центризируем камеру относительно персонажа
         for e in all_sprites:
             camera.apply(e, "blocks")
         for i in range(len(x_enemy)):
             ene = Enemy(x_enemy[i], y_enemy[i])
             camera.apply(ene, i)
+        if ifBoss:
+            camera.apply(Bora, "Boss")
 
         # проверка есть ли ключ и столкновение с дверью
         a.IfNextLevel()
 
         clock.tick(60)
-        pygame.display.set_caption(
-            f"{int(clock.get_fps()), player.animation_range_right}")
+        pygame.display.set_caption(f"{int(clock.get_fps())}")
+
+        screen.blit(Hits, (20, 20))
+        screen.blit(YourHaveKey, (200, 20))
+
         pygame.display.update()
 
 
 def start_the_game():
-    # GAME()
-    # print(1)
-    start_menu_bg = pygame.image.load("../IMAGE_GAME/IMAGE_MAP/Bg_start.jpg")
 
-    start_btn = pygame.draw.rect(screen, (255, 255, 255),
-                 (20, 20, 100, 75))
+    start_menu_bg = pygame.image.load("../IMAGE_GAME/IMAGE_MAP/Bg_start.jpg")
 
     sc = pygame.display.set_mode((1400, 800))
     sc.blit(start_menu_bg, (0, 0))
@@ -320,9 +366,6 @@ def start_the_game():
 
     Rect_start = pygame.Rect((585, 502, 200, 40))
     Rect_exit = pygame.Rect((585, 552, 200, 40))
-
-    # здесь будут рисоваться фигуры
-
 
     while 1:
         for event in pg.event.get():
@@ -363,3 +406,4 @@ all_sprites = pg.sprite.Group()
 go_game = True
 while go_game:
     start_the_game()
+    # Win(7486)
