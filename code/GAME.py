@@ -35,6 +35,7 @@ class Game:
         self.deding = True
         self.ifBoss = False
 
+
     def plats(self):
         global x_enemy, y_enemy
         x_enemy = []
