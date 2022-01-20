@@ -35,7 +35,7 @@ BOSS_H = 150
 
 GameOn = False
 
-allMap = ["testMap.txt", "FirstMap.txt", "SecondMap.txt", "BossMap.txt"]
+allMap = ["testMap.txt", "FirstMap.txt", "TwoSecondMap.txt", "BossMap.txt"]
 HaveKey = False
 level = open(f"../MAPS/{allMap[0]}", mode='r', encoding="utf-8").readlines()
 
