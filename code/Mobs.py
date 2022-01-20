@@ -17,11 +17,6 @@ class Player(pygame.sprite.Sprite):
         self.y_hero = self.wall_y = 250
         self.speed_left = 5
         self.speed_right = 5
-        # self.image_hero_list = [
-        #     pygame.image.load('../IMAGE_GAME/IMAGE_HERO_D/GG/ggStep1.png'),
-        #     pygame.image.load('../IMAGE_GAME/IMAGE_HERO_D/GG/ggStep2.png')]
-        # self.image_hero_list[0] = pygame.transform.scale(self.image_hero_list[0], (30, 50))
-        # self.image_hero_list[1] = pygame.transform.scale(self.image_hero_list[1], (30, 50))
 
         self.image_hero_list_right = [
             pygame.image.load('../IMAGE_GAME/IMAGE_HERO_D/GG/ggStep1.png'),
@@ -53,7 +48,7 @@ class Player(pygame.sprite.Sprite):
         self.stop_jump = True
         self.right = False
         self.left = False
-        self.Hitpoints = 140
+        self.Hitpoints = 100
 
         self.animation_range_right = 0
         self.animation_range_left = 0
@@ -122,73 +117,7 @@ class Attack_Boss(pg.sprite.Sprite):
         self.image = pg.image.load("../IMAGE_GAME/IMAGE_HERO_D/Non.png")
         self.image = self.image
         self.rect = pg.Rect(x, y, v, z)
-        pygame.draw.rect(screen, (255, 255, 255), (x, y, v, z))
+        # pygame.draw.rect(screen, (255, 255, 255), (x, y, v, z))
 
-
-BOSS_W = 250
-BOSS_H = 150
-player = Player()
-
-
-class Borov(pg.sprite.Sprite):
-    def __init__(self, x, y):
-        pg.sprite.Sprite.__init__(self)
-        self.x_boss = x
-        self.y_boss = y
-
-        self.speed_step = 2
-        self.speed_push = 7
-
-        self.rect = pg.Rect(self.x_boss, self.y_boss, BOSS_W, BOSS_H)
-        self.image_b = pg.image.load("../IMAGE_GAME/IMAGE_HERO_D/Inoske.jpg")
-        self.image_b = pg.transform.scale(self.image_b, (BOSS_W, BOSS_H))
-
-        self.vizor = False
-
-    def movi(self):
-        pass
-
-    def scanning(self):
-        self.rect = pygame.Rect(700, player.y_hero, 30, 50)
-        left_visor = Attack_Boss(self.x_boss - 800, self.y_boss + 120, 800, 20)
-        right_visor = Attack_Boss(self.x_boss + 250, self.y_boss + 120, 800, 20)
-        r = pygame.sprite.Group()
-        r.add(right_visor)
-        l = pygame.sprite.Group()
-        l.add(left_visor)
-        if pygame.sprite.spritecollideany(self, r):
-            self.vizor = "Right"
-        elif pygame.sprite.spritecollideany(self, l):
-            self.vizor = "Left"
-        else:
-            self.vizor = "None"
-
-    def attaks(self, gogogoGOOOOOOOOOOO):
-        global x_bora
-        if gogogoGOOOOOOOOOOO == "Right":
-            x_bora += 10
-            self.push()
-        if gogogoGOOOOOOOOOOO == "Left":
-            x_bora -= 10
-            self.push()
-
-    def walls(self):
-        pass
-
-    def push(self):
-        global x_bora, y_bora
-        self.rect = pygame.Rect(700, player.y_hero, 30, 50)
-        GOOOOOOOOOOOOOOOD = Attack_Boss(x_bora, y_bora, BOSS_W, BOSS_H)
-        FackingPUUUUUSH = pygame.sprite.Group()
-        FackingPUUUUUSH.add(GOOOOOOOOOOOOOOOD)
-        if pygame.sprite.spritecollideany(self, FackingPUUUUUSH):
-            player.Hitpoints -= 100000
-
-    def update(self):
-        self.scanning()
-        if self.vizor != "None":
-            print("GOGOGOGOGO")
-            self.attaks(self.vizor)
-        self.walls()
 
 

@@ -58,7 +58,7 @@ class Game:
             if pygame.sprite.spritecollideany(self, self.ThisDoor):
                 self.plats()
                 self.ThisIsMap += 1
-                if self.ThisIsMap > 2:
+                if self.ThisIsMap > 3:
                     Win(pygame.time.get_ticks() // 1000)
                 level = open(f"../MAPS/{allMap[self.ThisIsMap]}", mode='r', encoding="utf-8").readlines()
                 mapping(level)
@@ -87,21 +87,17 @@ def mapping(level):
                 pa = Platform(x, y)
                 pl = Left_Platform(x, y)
                 pr = Right_Platform(x, y)
-                # pu = Up_Platform(x, y)
                 pp = PP_Platform(x, y)
                 a.entities.add(pa)
                 a.Left_plat.add(pl)
                 a.Right_plat.add(pr)
-                # a.Up_plat.add(pu)
                 a.PP_plat.add(pp)
             elif col == "_":
                 pu = Up_Platform(x, y)
                 a.Up_plat.add(pu)
             elif col == "E":
-                # opponent = Enemy(x, y)
                 x_enemy.append(x)
                 y_enemy.append(y)
-                # adversary.add(opponent)
             elif col == "D":
                 nextLevel = Door(x, y)
                 a.ThisDoor.add(nextLevel)
@@ -125,7 +121,6 @@ class Attack(pg.sprite.Sprite):
         self.image = pg.Surface((v, 10))
         self.image = pg.image.load("../IMAGE_GAME/IMAGE_HERO_D/Non.png")
         self.image = self.image
-        # self.image.fill(pg.Color(PLATFORM_COLOR))
         self.rect = pg.Rect(x, y + 10, v, z)
         if draf:
             pygame.draw.rect(screen, (255, 255, 255),
@@ -142,13 +137,11 @@ class Enemy(pg.sprite.Sprite):
         self.speed_enemy = 5
         # создание спрайтов для отображения
         self.rect = pg.Rect(self.x_e, self.y_e, ENEMY_WIDTH, ENEMY_HEIGHT)
-        # self.image = pg.Surface((ENEMY_WIDTH, ENEMY_HEIGHT))
         self.image = pg.image.load("../IMAGE_GAME/IMAGE_HERO_D/Inoske.jpg")
         self.image = pg.transform.scale(self.image, (60, 60))
         self.yvel = 5
 
     def movi_enemy(self, where):
-        # self.x_e += self.speed_enemy
         if where == "Right":
             x_enemy[self.typ] += self.speed_enemy
         elif where == "Left":
@@ -261,6 +254,66 @@ class Camera:
         self.dy = (player.y_hero - player.yy_hero)
 
 
+class Borov(pg.sprite.Sprite):
+    def __init__(self, x, y):
+        pg.sprite.Sprite.__init__(self)
+        self.x_boss = x
+        self.y_boss = y
+
+        self.speed_step = 2
+        self.speed_push = 7
+
+        self.rect = pg.Rect(self.x_boss, self.y_boss, BOSS_W, BOSS_H)
+        self.image_b = pg.image.load("../IMAGE_GAME/IMAGE_HERO_D/Inoske.jpg")
+        self.image_b = pg.transform.scale(self.image_b, (BOSS_W, BOSS_H))
+
+        self.vizor = False
+
+    def movi(self):
+        pass
+
+    def scanning(self):
+        self.rect = pygame.Rect(700, player.y_hero, 30, 50)
+        left_visor = Attack_Boss(self.x_boss - 800, self.y_boss + 120, 800, 20)
+        right_visor = Attack_Boss(self.x_boss + 250, self.y_boss + 120, 800, 20)
+        r = pygame.sprite.Group()
+        r.add(right_visor)
+        l = pygame.sprite.Group()
+        l.add(left_visor)
+        if pygame.sprite.spritecollideany(self, r):
+            self.vizor = "Right"
+        elif pygame.sprite.spritecollideany(self, l):
+            self.vizor = "Left"
+        else:
+            self.vizor = "None"
+
+    def attaks(self, gogogoGOOOOOOOOOOO):
+        global x_bora
+        if gogogoGOOOOOOOOOOO == "Right":
+            x_bora += 10
+            self.push()
+        if gogogoGOOOOOOOOOOO == "Left":
+            x_bora -= 10
+            self.push()
+
+    def walls(self):
+        pass
+
+    def push(self):
+        global x_bora, y_bora
+        self.rect = pygame.Rect(700, player.y_hero, 30, 50)
+        GOOOOOOOOOOOOOOOD = Attack_Boss(x_bora, y_bora, BOSS_W, BOSS_H)
+        FackingPUUUUUSH = pygame.sprite.Group()
+        FackingPUUUUUSH.add(GOOOOOOOOOOOOOOOD)
+        if pygame.sprite.spritecollideany(self, FackingPUUUUUSH):
+            player.Hitpoints -= 100000
+
+    def update(self):
+        self.scanning()
+        if self.vizor != "None":
+            self.attaks(self.vizor)
+        self.walls()
+
 
 def GAME():
     global run
@@ -285,8 +338,6 @@ def GAME():
         if a.HaveKey == False:
             YourHaveKey = font.render("У вас нет ключа", True, (0, 0, 0))
 
-        # NowTime = font.render(f" Время в секундах: {pygame.time.get_ticks() // 1000}", True, (0, 0, 0))
-
         # death
         a.Death()
         a.copy()
@@ -305,13 +356,11 @@ def GAME():
             ene = Enemy(x_enemy[i], y_enemy[i])
             ene.update(i, a.entities, a.Left_plat, a.Right_plat, a.Up_plat, a.PP_plat)
             screen.blit(ene.image, (ene.x_e, ene.y_e))
-        # создание спрайта ирока для работы с камерой
         # обновление платформ и их вывод
         player.update(a.entities, a.Left_plat, a.Right_plat, a.Up_plat, a.PP_plat, a.Key)
         a.Keyying()
         a.entities.draw(screen)
         a.ThisDoor.draw(screen)
-        # a.Up_plat.draw(screen)
         if a.HaveKey == False:
             a.Key.draw(screen)
 
@@ -337,7 +386,6 @@ def GAME():
             camera.apply(ene, i)
         if ifBoss:
             camera.apply(Bora, "Boss")
-
         # проверка есть ли ключ и столкновение с дверью
         a.IfNextLevel()
 
@@ -406,4 +454,3 @@ all_sprites = pg.sprite.Group()
 go_game = True
 while go_game:
     start_the_game()
-    # Win(7486)

@@ -27,18 +27,16 @@ ENEMY_WIDTH = 40
 ENEMY_HEIGHT = 50
 x_enemy = []
 y_enemy = []
-x_bora = []
-y_bora = []
+
 ifBoss = False
+BOSS_W = 250
+BOSS_H = 150
 
 
 GameOn = False
 
-allMap = ["FirstMap.txt", "SecondMap.txt", "BossMap.txt"]
+allMap = ["testMap.txt", "FirstMap.txt", "SecondMap.txt", "BossMap.txt"]
 HaveKey = False
 level = open(f"../MAPS/{allMap[0]}", mode='r', encoding="utf-8").readlines()
-
-aa = 400
-bb = 250
 
 IfWin = False
